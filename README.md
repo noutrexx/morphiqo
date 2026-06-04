@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# Morphiqo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Morphiqo, React + TypeScript + Vite ile yapılmış basit bir dosya dönüştürme arayüzüdür.
 
-Currently, two official plugins are available:
+Bu proje öğrenci projesi mantığında tutuldu: kod parçaları küçük, isimler anlaşılır ve backend entegrasyonu sade bir API client üzerinden hazırlandı.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Çalıştırma
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Backend ayarı
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Backend varsa `.env` dosyasına şunu yaz:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_API_BASE_URL=http://localhost:3000
 ```
+
+Backend yoksa uygulama geliştirme modunda mock fallback kullanır.
+
+## Planlanan API
+
+- `POST /api/convert`: Dosyayı `multipart/form-data` ile yükler ve job oluşturur.
+- `GET /api/jobs/:jobId`: Job durumunu ve progress bilgisini döner.
+- `GET /api/jobs/:jobId/download`: Tamamlanan dosyayı indirir.
+
+## Backend motor fikri
+
+- Image: Sharp veya ImageMagick
+- Video/audio: FFmpeg
+- Word, Excel, PowerPoint -> PDF: LibreOffice headless
+- Markdown, HTML, TXT -> PDF/DOCX: Pandoc
+- Archive: 7zip
+
+## Ana dosyalar
+
+- `src/config/conversionRules.ts`: Formatlar ve dönüşüm kuralları.
+- `src/services/conversionService.ts`: API client, polling ve mock fallback.
+- `src/hooks/useConversionManager.ts`: Queue, history ve job yönetimi.
+- `src/components/ConversionQueue.tsx`: İşlem kuyruğu.
+- `src/components/ConversionHistory.tsx`: Sol panel ve localStorage geçmişi.
