@@ -9,7 +9,7 @@ import {
   MAX_FILE_SIZE_BYTES,
   normalizeFormat,
 } from '../data/formats'
-import { runConversion } from '../services/conversionService'
+import { runConversion } from '../services/clientConversionService'
 import type { ConversionJob, ConversionRecord, UploadedFileItem } from '../types/converter'
 import { createId, downloadBlobUrl, formatBytes } from '../utils/file'
 import {

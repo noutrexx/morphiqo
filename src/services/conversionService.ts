@@ -1,297 +1,65 @@
-import { getConversionMode, normalizeFormat } from '../config/conversionRules'
-import type { BrowserConversionResult, ConversionRequest, ConversionResult } from '../types/converter'
-import { createOutputFileName, escapeHtml } from '../utils/file'
+import path from 'node:path'
+import { getJob, updateJob } from '../jobs/jobStore.js'
+import { getFormatCategory, isBrowserImageConversion } from '../config/formats.js'
+import { convertDocument } from './documentService.js'
+import { convertImage } from './imageService.js'
+import { convertVideoOrAudio } from './videoService.js'
+import { buildOutputPath } from '../utils/files.js'
 
-interface RunConversionOptions {
-  request: ConversionRequest
-  onProgress: (progress: number) => void
-  onStatus: (status: ConversionResult['status'], message?: string) => void
-}
-
-interface ApiJobResponse {
+interface StartConversionOptions {
   jobId: string
-  status?: ConversionResult['status']
-  progress?: number
-  fileName?: string
-  message?: string
+  inputPath: string
+  originalName: string
+  sourceFormat: string
+  targetFormat: string
 }
 
-interface ApiStatusResponse {
-  jobId: string
-  status: ConversionResult['status']
-  progress?: number
-  fileName?: string
-  message?: string
-}
-
-const imageMimeTypes: Record<string, string> = {
-  jpg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-}
-
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? ''
-
-export async function runConversion({
-  request,
-  onProgress,
-  onStatus,
-}: RunConversionOptions): Promise<ConversionResult> {
-  if (apiBaseUrl) {
-    try {
-      return await runApiConversion(request, onProgress, onStatus)
-    } catch (error) {
-      if (!import.meta.env.DEV) {
-        throw error
-      }
-
-      onStatus('processing', 'API bulunamadı, mock çalışıyor.')
-      return runMockConversion(request, onProgress, onStatus)
-    }
-  }
-
-  return runMockConversion(request, onProgress, onStatus)
-}
-
-async function runApiConversion(
-  request: ConversionRequest,
-  onProgress: (progress: number) => void,
-  onStatus: (status: ConversionResult['status'], message?: string) => void,
-): Promise<ConversionResult> {
-  const formData = new FormData()
-  formData.append('file', request.file)
-  formData.append('sourceFormat', request.sourceFormat)
-  formData.append('targetFormat', request.targetFormat)
-
-  onStatus('uploading')
-  onProgress(12)
-
-  const createResponse = await fetch(`${apiBaseUrl}/api/convert`, {
-    method: 'POST',
-    body: formData,
+export async function startConversion(options: StartConversionOptions): Promise<void> {
+  updateJob(options.jobId, {
+    status: 'processing',
+    progress: 10,
+    message: 'Dönüşüm başladı.',
   })
 
-  if (!createResponse.ok) {
-    throw new Error('Dosya backend servisine yüklenemedi.')
-  }
-
-  const createdJob = (await createResponse.json()) as ApiJobResponse
-  onStatus('processing', createdJob.message)
-  onProgress(createdJob.progress ?? 25)
-
-  const completedJob = await pollJob(createdJob.jobId, onProgress, onStatus)
-
-  if (completedJob.status === 'failed') {
-    throw new Error(completedJob.message ?? 'Dönüşüm başarısız oldu.')
-  }
-
-  if (completedJob.status === 'requires_server') {
-    return {
-      jobId: completedJob.jobId,
-      status: 'requires_server',
-      progress: completedJob.progress ?? 100,
-      message: completedJob.message ?? 'Bu işlem backend motoru ister.',
-    }
-  }
-
-  return {
-    jobId: completedJob.jobId,
-    status: 'completed',
-    progress: 100,
-    outputName: completedJob.fileName ?? createOutputFileName(request.file.name, request.targetFormat),
-    downloadUrl: `${apiBaseUrl}/api/jobs/${completedJob.jobId}/download`,
-    message: completedJob.message ?? 'Dönüşüm tamamlandı.',
-  }
-}
-
-async function pollJob(
-  jobId: string,
-  onProgress: (progress: number) => void,
-  onStatus: (status: ConversionResult['status'], message?: string) => void,
-): Promise<ApiStatusResponse> {
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    await wait(900)
-
-    const statusResponse = await fetch(`${apiBaseUrl}/api/jobs/${jobId}`)
-    if (!statusResponse.ok) {
-      throw new Error('İş durumu okunamadı.')
-    }
-
-    const job = (await statusResponse.json()) as ApiStatusResponse
-    onStatus(job.status, job.message)
-    onProgress(job.progress ?? 40)
-
-    if (job.status === 'completed' || job.status === 'failed' || job.status === 'requires_server') {
-      return job
-    }
-  }
-
-  throw new Error('Dönüşüm çok uzun sürdü.')
-}
-
-async function runMockConversion(
-  request: ConversionRequest,
-  onProgress: (progress: number) => void,
-  onStatus: (status: ConversionResult['status'], message?: string) => void,
-): Promise<ConversionResult> {
-  const { file, sourceFormat, targetFormat } = request
-  const source = normalizeFormat(sourceFormat)
-  const target = normalizeFormat(targetFormat)
-  const mode = getConversionMode(source, target)
-
-  if (mode === 'invalid') {
-    throw new Error('Format eşleşmesi hatalı.')
-  }
-
-  onStatus('queued')
-  onProgress(8)
-  await wait(260)
-  onStatus('processing')
-
-  if (mode === 'server') {
-    onProgress(100)
-    return {
-      status: 'requires_server',
+  runConversion(options).catch((error: unknown) => {
+    updateJob(options.jobId, {
+      status: 'failed',
       progress: 100,
-      message: 'Bu dönüşüm için backend motoru gerekir.',
-    }
-  }
-
-  if (mode === 'browser' && isBrowserImagePair(source, target)) {
-    const result = await convertImage(file, target, onProgress)
-    return toCompletedResult(result)
-  }
-
-  const result = await convertTextLikeFile(file, source, target, onProgress)
-  return toCompletedResult(result)
-}
-
-async function convertImage(
-  file: File,
-  targetFormat: string,
-  onProgress: (progress: number) => void,
-): Promise<BrowserConversionResult> {
-  const imageUrl = URL.createObjectURL(file)
-
-  try {
-    const image = await loadImage(imageUrl)
-    onProgress(56)
-
-    const canvas = document.createElement('canvas')
-    canvas.width = image.naturalWidth
-    canvas.height = image.naturalHeight
-
-    const context = canvas.getContext('2d')
-    if (!context) {
-      throw new Error('Canvas hazır değil.')
-    }
-
-    if (targetFormat === 'jpg') {
-      context.fillStyle = '#ffffff'
-      context.fillRect(0, 0, canvas.width, canvas.height)
-    }
-
-    context.drawImage(image, 0, 0)
-    onProgress(78)
-
-    const blob = await canvasToBlob(canvas, imageMimeTypes[targetFormat], targetFormat === 'jpg' ? 0.92 : 0.95)
-    onProgress(100)
-
-    return {
-      blob,
-      outputName: createOutputFileName(file.name, targetFormat),
-      message: 'Canvas conversion complete',
-    }
-  } finally {
-    URL.revokeObjectURL(imageUrl)
-  }
-}
-
-async function convertTextLikeFile(
-  file: File,
-  sourceFormat: string,
-  targetFormat: string,
-  onProgress: (progress: number) => void,
-): Promise<BrowserConversionResult> {
-  const sourceText = await file.text()
-  onProgress(62)
-
-  const outputText = transformText(sourceText, sourceFormat, targetFormat)
-  const mimeType = targetFormat === 'html' ? 'text/html;charset=utf-8' : 'text/plain;charset=utf-8'
-  onProgress(100)
-
-  return {
-    blob: new Blob([outputText], { type: mimeType }),
-    outputName: createOutputFileName(file.name, targetFormat),
-    message: 'Browser text conversion complete',
-  }
-}
-
-function transformText(sourceText: string, sourceFormat: string, targetFormat: string): string {
-  if (targetFormat === 'html') {
-    const title = sourceFormat === 'md' ? 'Markdown export' : 'Text export'
-    return `<!doctype html>
-<html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <title>${title}</title>
-  </head>
-  <body>
-    <pre>${escapeHtml(sourceText)}</pre>
-  </body>
-</html>`
-  }
-
-  if (sourceFormat === 'html') {
-    const parser = new DOMParser()
-    return parser.parseFromString(sourceText, 'text/html').body.textContent ?? ''
-  }
-
-  return sourceText
-}
-
-function isBrowserImagePair(sourceFormat: string, targetFormat: string): boolean {
-  return sourceFormat in imageMimeTypes && targetFormat in imageMimeTypes
-}
-
-function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image()
-    image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error('Görsel okunamadı.'))
-    image.src = url
+      message: error instanceof Error ? error.message : 'Dönüşüm başarısız.',
+    })
   })
 }
 
-function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality: number): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          resolve(blob)
-          return
-        }
+async function runConversion({
+  jobId,
+  inputPath,
+  originalName,
+  sourceFormat,
+  targetFormat,
+}: StartConversionOptions): Promise<void> {
+  const job = getJob(jobId)
+  if (!job) {
+    return
+  }
 
-        reject(new Error('Çıktı üretilemedi.'))
-      },
-      mimeType,
-      quality,
-    )
-  })
-}
+  const outputPath = buildOutputPath(jobId, originalName, targetFormat)
+  const category = getFormatCategory(sourceFormat)
 
-function wait(duration: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, duration))
-}
+  if (isBrowserImageConversion(sourceFormat, targetFormat)) {
+    await convertImage({ inputPath, outputPath, targetFormat })
+  } else if (category === 'Video' || category === 'Audio') {
+    await convertVideoOrAudio({ inputPath, outputPath })
+  } else if (category === 'Document' || category === 'Spreadsheet' || category === 'Presentation') {
+    await convertDocument({ inputPath, outputDir: path.dirname(outputPath), targetFormat })
+  } else {
+    throw new Error('Bu dönüşüm motoru henüz hazır değil.')
+  }
 
-function toCompletedResult(result: BrowserConversionResult): ConversionResult {
-  const downloadUrl = URL.createObjectURL(result.blob)
-
-  return {
+  updateJob(jobId, {
     status: 'completed',
     progress: 100,
-    outputName: result.outputName,
-    downloadUrl,
-    message: result.message,
-  }
+    outputPath,
+    outputName: path.basename(outputPath),
+    message: 'Dönüşüm tamamlandı.',
+  })
 }

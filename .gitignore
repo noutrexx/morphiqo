@@ -1,5 +1,8 @@
 node_modules
 dist
+dist-api
+uploads
+outputs
 .env
 .env.local
 .DS_Store

@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "rootDir": "src",
+    "outDir": "dist-api"
+  },
+  "include": [
+    "src/server.ts",
+    "src/routes/**/*.ts",
+    "src/jobs/**/*.ts",
+    "src/config/formats.ts",
+    "src/services/conversionService.ts",
+    "src/services/imageService.ts",
+    "src/services/videoService.ts",
+    "src/services/documentService.ts",
+    "src/utils/files.ts"
+  ]
+}

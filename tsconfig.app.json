@@ -21,5 +21,16 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/server.ts",
+    "src/routes",
+    "src/jobs",
+    "src/config/formats.ts",
+    "src/services/conversionService.ts",
+    "src/services/imageService.ts",
+    "src/services/videoService.ts",
+    "src/services/documentService.ts",
+    "src/utils/files.ts"
+  ]
 }
