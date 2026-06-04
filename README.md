@@ -13,24 +13,7 @@ Designed and vibe-coded by **noutrexx**.
 
 ## Preview
 
-### Full page
-
-The complete Morphiqo workspace, including the upload flow, format selection, workspace state, and engine section.
-
 ![Morphiqo full page preview](./docs/screenshots/00-full-page.png)
-
-### Product views
-
-| Convert workspace | Workspace detail |
-| --- | --- |
-| Upload files, choose compatible targets, and start conversion jobs. | Review active uploads, quick output state, and local conversion history. |
-| <img src="./docs/screenshots/01-convert-workspace.png" alt="Upload and conversion workspace" width="420" /> | <img src="./docs/screenshots/03-workspace-detail.png" alt="Workspace detail and local history" width="420" /> |
-
-### Engine systems
-
-Engine matrix, GitHub profile, and project ownership cards.
-
-<img src="./docs/screenshots/02-systems.png" alt="Engine and profile systems section" width="640" />
 
 ## Highlights
 
