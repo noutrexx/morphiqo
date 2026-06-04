@@ -19,6 +19,28 @@ Designed and vibe-coded by **noutrexx**.
 
 The preview shows the main desktop conversion workspace: upload, compatible target formats, queue actions, and local job state.
 
+<br />
+
+### Additional views
+
+<p align="center">
+  <img src="./docs/screenshots/04-mobile-convert.png" alt="Morphiqo mobile convert workspace" width="260" />
+</p>
+
+<p align="center">
+  Mobile view of the main conversion flow.
+</p>
+
+<br />
+
+<p align="center">
+  <img src="./docs/screenshots/02-systems.png" alt="Morphiqo engine systems section" width="720" />
+</p>
+
+<p align="center">
+  Engine systems section with conversion engines, GitHub profile, and ownership cards.
+</p>
+
 ## Highlights
 
 - Dark, premium converter workspace focused on the upload-to-download flow
