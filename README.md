@@ -13,7 +13,11 @@ Designed and vibe-coded by **noutrexx**.
 
 ## Preview
 
-![Morphiqo full page preview](./docs/screenshots/00-full-page.png)
+<p align="center">
+  <img src="./docs/screenshots/01-convert-workspace.png" alt="Morphiqo desktop convert workspace" width="900" />
+</p>
+
+The preview shows the main desktop conversion workspace: upload, compatible target formats, queue actions, and local job state.
 
 ## Highlights
 
