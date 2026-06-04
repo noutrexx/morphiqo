@@ -15,6 +15,20 @@ Designed and vibe-coded by **noutrexx**.
 
 ![Morphiqo conversion workspace](./docs/screenshots/00-full-page.png)
 
+The main view keeps upload, target selection, workspace status, and engine information in one focused interface.
+
+## Screenshots
+
+| Convert workspace | Core systems |
+| --- | --- |
+| ![Upload and conversion workspace](./docs/screenshots/01-convert-workspace.png) | ![Engine and profile systems section](./docs/screenshots/02-systems.png) |
+| Upload files, choose compatible targets, and start conversion jobs. | Engine matrix, GitHub profile, and project ownership cards. |
+
+| Workspace detail |
+| --- |
+| ![Workspace detail and local history](./docs/screenshots/03-workspace-detail.png) |
+| Active uploads, quick output state, and local conversion history. |
+
 ## Highlights
 
 - Dark, premium converter workspace focused on the upload-to-download flow
@@ -33,6 +47,45 @@ Designed and vibe-coded by **noutrexx**.
 - Backend: Express, TypeScript, Multer
 - Conversion: Sharp, pdf-parse, docx, external engine runner
 - Optional engines: FFmpeg, LibreOffice, Pandoc, ImageMagick, 7zip
+
+## Requirements
+
+Required:
+
+- Node.js 20 or newer
+- npm 10 or newer
+
+Optional conversion engines:
+
+- FFmpeg: video and audio conversions
+- LibreOffice: document, spreadsheet, and presentation conversions
+- Pandoc: document format conversions
+- ImageMagick: extended image conversions
+- 7zip: archive conversions
+
+Windows install examples:
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+winget install Gyan.FFmpeg
+winget install TheDocumentFoundation.LibreOffice
+winget install 7zip.7zip
+winget install ImageMagick.ImageMagick
+```
+
+macOS install examples:
+
+```bash
+brew install node ffmpeg libreoffice pandoc imagemagick p7zip
+```
+
+Linux install examples:
+
+```bash
+sudo apt install nodejs npm ffmpeg libreoffice pandoc imagemagick p7zip-full
+```
+
+Sharp image conversions work after `npm install`. The optional engines are only needed for the conversion families that depend on them.
 
 ## Getting Started
 
