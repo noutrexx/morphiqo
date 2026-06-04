@@ -164,6 +164,7 @@
 
 .dropzone__button,
 .primary-action,
+.secondary-action,
 .download-button,
 .icon-button {
   display: inline-flex;
@@ -202,6 +203,16 @@
   font-weight: 800;
 }
 
+.secondary-action {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--panel-strong);
+  font-weight: 800;
+}
+
 .download-button {
   min-height: 34px;
   padding: 0 12px;
@@ -213,6 +224,7 @@
 
 .dropzone__button:hover,
 .primary-action:hover,
+.secondary-action:hover,
 .download-button:hover,
 .icon-button:hover {
   transform: translateY(-1px);
@@ -332,6 +344,7 @@
 .conversion-row__bottom,
 .history-item,
 .history-item__actions,
+.row-actions,
 .detail-block,
 .format-group > div {
   display: flex;

@@ -1,21 +1,23 @@
-import { Download, Play, Trash2 } from 'lucide-react'
+import { Play, Trash2 } from 'lucide-react'
+import { ConversionQueue } from './ConversionQueue'
 import { FileDropzone } from './FileDropzone'
-import { FormatSelect } from './FormatSelect'
-import { StatusBadge } from './StatusBadge'
+import { FormatSelector } from './FormatSelector'
 import { getConversionMode } from '../data/formats'
-import type { ConversionRecord, UploadedFileItem } from '../types/converter'
+import type { ConversionJob, UploadedFileItem } from '../types/converter'
 import { formatBytes } from '../utils/file'
 
 interface ConversionPanelProps {
   activeFile?: UploadedFileItem
   canConvert: boolean
-  conversions: ConversionRecord[]
+  jobs: ConversionJob[]
   isConverting: boolean
   pairMessage: string
   onAddFiles: (files: File[]) => void
+  onConvertAll: () => void
   onConvert: () => void
-  onDownload: (conversion: ConversionRecord) => void
+  onDownload: (job: ConversionJob) => void
   onRemoveFile: (fileId: string) => void
+  onRetry: (job: ConversionJob) => void
   onSourceChange: (format: string) => void
   onTargetChange: (format: string) => void
 }
@@ -23,18 +25,19 @@ interface ConversionPanelProps {
 export function ConversionPanel({
   activeFile,
   canConvert,
-  conversions,
+  jobs,
   isConverting,
   pairMessage,
   onAddFiles,
+  onConvertAll,
   onConvert,
   onDownload,
   onRemoveFile,
+  onRetry,
   onSourceChange,
   onTargetChange,
 }: ConversionPanelProps) {
   const mode = activeFile ? getConversionMode(activeFile.sourceFormat, activeFile.targetFormat) : 'invalid'
-  const latestConversions = conversions.slice(0, 4)
 
   return (
     <section className="converter-panel" aria-label="Ana dönüşüm paneli">
@@ -70,13 +73,13 @@ export function ConversionPanel({
       </div>
 
       <div className="format-grid">
-        <FormatSelect
+        <FormatSelector
           id="source-format"
           label="Kaynak"
           value={activeFile?.sourceFormat ?? ''}
           onChange={onSourceChange}
         />
-        <FormatSelect
+        <FormatSelector
           id="target-format"
           label="Hedef"
           value={activeFile?.targetFormat ?? ''}
@@ -90,53 +93,14 @@ export function ConversionPanel({
 
       <button className="primary-action" type="button" disabled={!canConvert} onClick={onConvert}>
         <Play size={18} />
-        {isConverting ? 'Dönüştürülüyor' : 'Dönüştür'}
+        {isConverting ? 'Kuyruk çalışıyor' : 'Seçili dosyayı dönüştür'}
       </button>
 
-      <section className="conversion-list" aria-label="Dönüşüm listesi">
-        <div className="section-heading">
-          <span className="eyebrow">İşlem durumu</span>
-          <strong>{latestConversions.length ? 'Son dönüşümler' : 'Henüz işlem yok'}</strong>
-        </div>
+      <button className="secondary-action" type="button" disabled={isConverting} onClick={onConvertAll}>
+        Tüm uygun dosyaları kuyruğa al
+      </button>
 
-        {latestConversions.length ? (
-          <div className="conversion-stack">
-            {latestConversions.map((conversion) => (
-              <article className="conversion-row" key={conversion.id}>
-                <div className="conversion-row__top">
-                  <div>
-                    <strong>{conversion.fileName}</strong>
-                    <span>
-                      {conversion.sourceFormat.toUpperCase()} → {conversion.targetFormat.toUpperCase()} ·{' '}
-                      {formatBytes(conversion.size)}
-                    </span>
-                  </div>
-                  <StatusBadge status={conversion.status} />
-                </div>
-                <div className="progress-track" aria-label={`${conversion.progress}% ilerleme`}>
-                  <span style={{ width: `${conversion.progress}%` }} />
-                </div>
-                <div className="conversion-row__bottom">
-                  <small>{conversion.message ?? 'Queue ready'}</small>
-                  <button
-                    className="download-button"
-                    type="button"
-                    disabled={!conversion.downloadUrl}
-                    onClick={() => onDownload(conversion)}
-                  >
-                    <Download size={15} />
-                    İndir
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <p>Dönüşüm başladığında burada progress ve çıktı görünecek.</p>
-          </div>
-        )}
-      </section>
+      <ConversionQueue jobs={jobs} onDownload={onDownload} onRetry={onRetry} />
     </section>
   )
 }
