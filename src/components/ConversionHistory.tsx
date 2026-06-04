@@ -1,5 +1,7 @@
-import { Download, Layers3, Trash2 } from 'lucide-react'
+import { CheckCircle2, Download, Layers3, Trash2, UploadCloud } from 'lucide-react'
 import { JobStatusBadge } from './JobStatusBadge'
+import { Button } from './ui/button'
+import { Card } from './ui/card'
 import type { ConversionJob, UploadedFileItem } from '../types/converter'
 import { formatBytes } from '../utils/file'
 
@@ -20,19 +22,56 @@ export function ConversionHistory({
   onDownload,
   onSelectFile,
 }: ConversionHistoryProps) {
+  const latestCompletedJob = jobs.find((job) => job.status === 'completed' && job.downloadUrl)
+
   return (
-    <aside className="side-panel" aria-label="Yüklenen dosyalar ve geçmiş">
+    <Card className="side-panel" aria-label="Uploaded files and conversion history">
       <section className="panel-section">
         <div className="section-heading">
-          <span className="eyebrow">Yüklenenler</span>
-          <strong>{files.length} dosya</strong>
+          <span className="eyebrow">Workspace</span>
+          <strong>{files.length ? `${files.length} files ready` : 'Start in seconds'}</strong>
+        </div>
+
+        {latestCompletedJob ? (
+          <article className="quick-output-card">
+            <span className="feature-icon">
+              <CheckCircle2 size={17} />
+            </span>
+            <div>
+              <strong>Latest output ready</strong>
+              <p>
+                {latestCompletedJob.sourceFormat.toUpperCase()} {'->'} {latestCompletedJob.targetFormat.toUpperCase()}
+              </p>
+            </div>
+            <Button className="download-button" type="button" onClick={() => onDownload(latestCompletedJob)}>
+              Download
+            </Button>
+          </article>
+        ) : (
+          <article className="quick-output-card quick-output-card--empty">
+            <span className="feature-icon">
+              <UploadCloud size={17} />
+            </span>
+            <div>
+              <strong>1. Add a file</strong>
+              <p>2. Pick a target, 3. convert, then download the result.</p>
+            </div>
+          </article>
+        )}
+      </section>
+
+      <section className="panel-section">
+        <div className="section-heading">
+          <span className="eyebrow">Uploads</span>
+          <strong>{files.length} files</strong>
         </div>
 
         {files.length ? (
           <div className="file-stack">
             {files.map((file) => (
-              <button
+              <Button
                 className={`file-item${activeFileId === file.id ? ' file-item--active' : ''}`}
+                variant="ghost"
                 key={file.id}
                 type="button"
                 onClick={() => onSelectFile(file.id)}
@@ -43,16 +82,16 @@ export function ConversionHistory({
                 <span className="file-item__body">
                   <strong>{file.name}</strong>
                   <small>
-                    {formatBytes(file.size)} · {file.sourceFormat ? file.sourceFormat.toUpperCase() : 'N/A'}
+                    {formatBytes(file.size)} - {file.sourceFormat ? file.sourceFormat.toUpperCase() : 'N/A'}
                   </small>
                 </span>
                 <JobStatusBadge status={file.status} />
-              </button>
+              </Button>
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <p>Dosyalar burada listelenir.</p>
+          <div className="empty-state empty-state--soft">
+            <p>Added files will appear here.</p>
           </div>
         )}
       </section>
@@ -61,18 +100,20 @@ export function ConversionHistory({
         <div className="section-heading section-heading--split">
           <div>
             <span className="eyebrow">History</span>
-            <strong>LocalStorage</strong>
+            <strong>Local record</strong>
           </div>
-          <button
+          <Button
             className="icon-button"
+            variant="ghost"
+            size="icon"
             type="button"
-            title="Geçmişi temizle"
-            aria-label="Geçmişi temizle"
+            title="Clear history"
+            aria-label="Clear history"
             disabled={!jobs.length}
             onClick={onClearHistory}
           >
             <Trash2 size={16} />
-          </button>
+          </Button>
         </div>
 
         {jobs.length ? (
@@ -82,31 +123,33 @@ export function ConversionHistory({
                 <div>
                   <strong>{job.fileName}</strong>
                   <small>
-                    {job.sourceFormat.toUpperCase()} → {job.targetFormat.toUpperCase()}
+                    {job.sourceFormat.toUpperCase()} {'->'} {job.targetFormat.toUpperCase()}
                   </small>
                 </div>
                 <div className="history-item__actions">
                   <JobStatusBadge status={job.status} />
-                  <button
+                  <Button
                     className="icon-button"
+                    variant="ghost"
+                    size="icon"
                     type="button"
-                    title="İndir"
-                    aria-label="İndir"
+                    title="Download"
+                    aria-label="Download"
                     disabled={job.status !== 'completed' || !job.downloadUrl}
                     onClick={() => onDownload(job)}
                   >
                     <Download size={16} />
-                  </button>
+                  </Button>
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <p>Son 12 işlem saklanır.</p>
+          <div className="empty-state empty-state--soft">
+            <p>The latest 12 jobs are stored here.</p>
           </div>
         )}
       </section>
-    </aside>
+    </Card>
   )
 }

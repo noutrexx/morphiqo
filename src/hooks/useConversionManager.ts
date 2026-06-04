@@ -32,13 +32,17 @@ export function useConversionManager() {
 
   const pairMessage = activeFile
     ? getPairMessage(activeFile.sourceFormat, activeFile.targetFormat)
-    : 'Dosya bekleniyor.'
+    : 'Waiting for a file.'
 
   const isConverting = jobs.some((job) => job.status === 'uploading' || job.status === 'processing')
+  const convertibleFiles = files.filter(
+    (file) => file.status === 'ready' && getConversionMode(file.sourceFormat, file.targetFormat) !== 'invalid',
+  )
   const canConvert =
     Boolean(activeFile) &&
     activeFile?.status === 'ready' &&
     getConversionMode(activeFile.sourceFormat, activeFile.targetFormat) !== 'invalid'
+  const canConvertAll = convertibleFiles.length > 0 && !isConverting
 
   useEffect(() => {
     saveStoredHistory(jobs.map(toRecord))
@@ -54,9 +58,10 @@ export function useConversionManager() {
 
   const addFiles = useCallback((incomingFiles: File[]) => {
     const nextFiles = incomingFiles.map(createUploadedFileItem)
+    const nextActiveFile = nextFiles.find((file) => file.status === 'ready') ?? nextFiles[0]
 
     setFiles((currentFiles) => [...nextFiles, ...currentFiles])
-    setActiveFileId((currentActiveId) => currentActiveId ?? nextFiles.find((file) => file.status === 'ready')?.id)
+    setActiveFileId(nextActiveFile?.id)
   }, [])
 
   const removeFile = useCallback(
@@ -72,30 +77,6 @@ export function useConversionManager() {
   const selectFile = useCallback((fileId: string) => {
     setActiveFileId(fileId)
   }, [])
-
-  const updateActiveSource = useCallback(
-    (sourceFormat: string) => {
-      if (!activeFile) {
-        return
-      }
-
-      const normalizedSource = normalizeFormat(sourceFormat)
-      setFiles((currentFiles) =>
-        currentFiles.map((file) =>
-          file.id === activeFile.id
-            ? {
-                ...file,
-                sourceFormat: normalizedSource,
-                category: getCategoryForFormat(normalizedSource),
-                status: isSupportedFormat(normalizedSource) ? 'ready' : 'invalid',
-                message: isSupportedFormat(normalizedSource) ? undefined : 'Desteklenmeyen format.',
-              }
-            : file,
-        ),
-      )
-    },
-    [activeFile],
-  )
 
   const updateActiveTarget = useCallback(
     (targetFormat: string) => {
@@ -203,7 +184,7 @@ export function useConversionManager() {
                 ...currentJob,
                 status: 'failed',
                 progress: 100,
-                message: error instanceof Error ? error.message : 'Dönüşüm başarısız.',
+                message: error instanceof Error ? error.message : 'Conversion failed.',
                 updatedAt: Date.now(),
               }
             : currentJob,
@@ -221,9 +202,14 @@ export function useConversionManager() {
   }, [activeFile, startJob])
 
   const convertAllFiles = useCallback(() => {
-    files.filter((file) => file.status === 'ready').forEach((file) => {
-      void startJob(file)
-    })
+    files
+      .filter(
+        (file) =>
+          file.status === 'ready' && getConversionMode(file.sourceFormat, file.targetFormat) !== 'invalid',
+      )
+      .forEach((file) => {
+        void startJob(file)
+      })
   }, [files, startJob])
 
   const retryJob = useCallback(
@@ -236,7 +222,7 @@ export function useConversionManager() {
               ? {
                   ...item,
                   status: 'failed',
-                  message: 'Dosya tekrar yüklenmeli.',
+                  message: 'Upload the file again.',
                   updatedAt: Date.now(),
                 }
               : item,
@@ -273,6 +259,7 @@ export function useConversionManager() {
     activeFile,
     activeFileId: activeFile?.id,
     addFiles,
+    canConvertAll,
     canConvert,
     clearHistory,
     conversions: jobs,
@@ -286,7 +273,6 @@ export function useConversionManager() {
     removeFile,
     retryJob,
     selectFile,
-    updateActiveSource,
     updateActiveTarget,
   }
 }
@@ -331,9 +317,9 @@ function createUploadedFileItem(file: File): UploadedFileItem {
     category,
     status: isInvalid ? 'invalid' : 'ready',
     message: isOversized
-      ? `Dosya limiti ${formatBytes(MAX_FILE_SIZE_BYTES)}.`
+      ? `File limit is ${formatBytes(MAX_FILE_SIZE_BYTES)}.`
       : isUnsupported
-        ? 'Desteklenmeyen format.'
+        ? 'Unsupported format.'
         : undefined,
   }
 }

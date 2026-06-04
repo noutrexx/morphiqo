@@ -1,0 +1,35 @@
+<svg width="620" height="180" viewBox="0 0 620 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Target format constellation">
+  <rect width="620" height="180" rx="20" fill="#0B1117"/>
+  <rect x="1" y="1" width="618" height="178" rx="19" stroke="#94A3B8" stroke-opacity="0.12" stroke-width="2"/>
+  <path d="M96 90H524" stroke="#2DD4BF" stroke-opacity="0.18" stroke-width="2" stroke-linecap="round"/>
+  <path d="M188 56L310 90L430 56" stroke="#34D399" stroke-opacity="0.2" stroke-width="2" stroke-linecap="round"/>
+  <path d="M188 124L310 90L430 124" stroke="#14B8A6" stroke-opacity="0.22" stroke-width="2" stroke-linecap="round"/>
+  <g>
+    <rect x="44" y="58" width="96" height="64" rx="12" fill="#121A22" stroke="#2DD4BF" stroke-opacity="0.26"/>
+    <text x="92" y="96" text-anchor="middle" fill="#CCFBF1" font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="800">PDF</text>
+  </g>
+  <g>
+    <rect x="166" y="32" width="96" height="64" rx="12" fill="#121A22" stroke="#34D399" stroke-opacity="0.24"/>
+    <text x="214" y="70" text-anchor="middle" fill="#D1FAE5" font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="800">DOCX</text>
+  </g>
+  <g>
+    <rect x="166" y="104" width="96" height="64" rx="12" fill="#121A22" stroke="#2DD4BF" stroke-opacity="0.2"/>
+    <text x="214" y="142" text-anchor="middle" fill="#CCFBF1" font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="800">TXT</text>
+  </g>
+  <g>
+    <circle cx="310" cy="90" r="33" fill="#10231F" stroke="#5EEAD4" stroke-opacity="0.38" stroke-width="2"/>
+    <path d="M295 90H325M325 90L314 79M325 90L314 101" stroke="#5EEAD4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g>
+    <rect x="408" y="32" width="96" height="64" rx="12" fill="#121A22" stroke="#34D399" stroke-opacity="0.24"/>
+    <text x="456" y="70" text-anchor="middle" fill="#D1FAE5" font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="800">PNG</text>
+  </g>
+  <g>
+    <rect x="408" y="104" width="96" height="64" rx="12" fill="#121A22" stroke="#2DD4BF" stroke-opacity="0.2"/>
+    <text x="456" y="142" text-anchor="middle" fill="#CCFBF1" font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="800">WEBP</text>
+  </g>
+  <g>
+    <rect x="530" y="58" width="46" height="64" rx="12" fill="#121A22" stroke="#F59E0B" stroke-opacity="0.22"/>
+    <text x="553" y="96" text-anchor="middle" fill="#FEF3C7" font-family="JetBrains Mono, Consolas, monospace" font-size="13" font-weight="800">+</text>
+  </g>
+</svg>

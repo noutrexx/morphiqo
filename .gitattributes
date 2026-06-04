@@ -1,0 +1,2 @@
+*.svg linguist-generated=true
+docs/screenshots/* linguist-documentation=true

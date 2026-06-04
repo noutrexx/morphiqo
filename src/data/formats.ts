@@ -4,6 +4,7 @@ export {
   FORMAT_GROUPS,
   MAX_FILE_SIZE_BYTES,
   getCategoryForFormat,
+  getConvertibleTargetFormats,
   getConversionMode,
   getDefaultTargetFormat,
   getFormatFromFileName,

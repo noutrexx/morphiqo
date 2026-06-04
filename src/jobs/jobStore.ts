@@ -1,6 +1,6 @@
 import type { FormatCategory } from '../types/converter.js'
 
-export type ServerJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
+export type ServerJobStatus = 'queued' | 'processing' | 'completed' | 'failed' | 'requires_server'
 
 export interface ServerJob {
   id: string
@@ -59,6 +59,7 @@ export function toPublicJob(job: ServerJob) {
     status: job.status,
     progress: job.progress,
     fileName: job.outputName,
+    outputName: job.outputName,
     message: job.message,
     sourceFormat: job.sourceFormat,
     targetFormat: job.targetFormat,

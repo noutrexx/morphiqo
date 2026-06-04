@@ -20,10 +20,15 @@
     "src/routes/**/*.ts",
     "src/jobs/**/*.ts",
     "src/config/formats.ts",
+    "src/services/archiveService.ts",
+    "src/services/commandRunner.ts",
     "src/services/conversionService.ts",
+    "src/services/engineHealthService.ts",
     "src/services/imageService.ts",
+    "src/services/pdfService.ts",
     "src/services/videoService.ts",
     "src/services/documentService.ts",
-    "src/utils/files.ts"
+    "src/utils/files.ts",
+    "src/types/**/*.d.ts"
   ]
 }

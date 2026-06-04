@@ -24,6 +24,10 @@ interface ApiStatusResponse {
   message?: string
 }
 
+interface ApiErrorResponse {
+  message?: string
+}
+
 const imageMimeTypes: Record<string, string> = {
   jpg: 'image/jpeg',
   png: 'image/png',
@@ -41,11 +45,15 @@ export async function runConversion({
     try {
       return await runApiConversion(request, onProgress, onStatus)
     } catch (error) {
+      if (error instanceof ApiRequestError) {
+        throw error
+      }
+
       if (!import.meta.env.DEV) {
         throw error
       }
 
-      onStatus('processing', 'API bulunamadı, mock çalışıyor.')
+      onStatus('processing', 'API is unavailable; using local mock mode.')
       return runMockConversion(request, onProgress, onStatus)
     }
   }
@@ -72,7 +80,7 @@ async function runApiConversion(
   })
 
   if (!createResponse.ok) {
-    throw new Error('Dosya backend servisine yüklenemedi.')
+    throw new ApiRequestError(await readApiError(createResponse, 'The file could not be uploaded to the backend service.'))
   }
 
   const createdJob = (await createResponse.json()) as ApiJobResponse
@@ -82,7 +90,7 @@ async function runApiConversion(
   const completedJob = await pollJob(createdJob.jobId, onProgress, onStatus)
 
   if (completedJob.status === 'failed') {
-    throw new Error(completedJob.message ?? 'Dönüşüm başarısız oldu.')
+    throw new Error(completedJob.message ?? 'Conversion failed.')
   }
 
   if (completedJob.status === 'requires_server') {
@@ -90,7 +98,7 @@ async function runApiConversion(
       jobId: completedJob.jobId,
       status: 'requires_server',
       progress: completedJob.progress ?? 100,
-      message: completedJob.message ?? 'Bu işlem backend motoru ister.',
+      message: completedJob.message ?? 'This conversion requires a backend engine.',
     }
   }
 
@@ -100,7 +108,7 @@ async function runApiConversion(
     progress: 100,
     outputName: completedJob.fileName ?? createOutputFileName(request.file.name, request.targetFormat),
     downloadUrl: `${apiBaseUrl}/api/jobs/${completedJob.jobId}/download`,
-    message: completedJob.message ?? 'Dönüşüm tamamlandı.',
+    message: completedJob.message ?? 'Conversion complete.',
   }
 }
 
@@ -114,7 +122,7 @@ async function pollJob(
 
     const statusResponse = await fetch(`${apiBaseUrl}/api/jobs/${jobId}`)
     if (!statusResponse.ok) {
-      throw new Error('İş durumu okunamadı.')
+      throw new ApiRequestError(await readApiError(statusResponse, 'Could not read job status.'))
     }
 
     const job = (await statusResponse.json()) as ApiStatusResponse
@@ -126,8 +134,19 @@ async function pollJob(
     }
   }
 
-  throw new Error('Dönüşüm çok uzun sürdü.')
+  throw new Error('Conversion took too long.')
 }
+
+async function readApiError(response: Response, fallbackMessage: string): Promise<string> {
+  try {
+    const payload = (await response.json()) as ApiErrorResponse
+    return payload.message ?? fallbackMessage
+  } catch {
+    return fallbackMessage
+  }
+}
+
+class ApiRequestError extends Error {}
 
 async function runMockConversion(
   request: ConversionRequest,
@@ -140,7 +159,7 @@ async function runMockConversion(
   const mode = getConversionMode(source, target)
 
   if (mode === 'invalid') {
-    throw new Error('Format eşleşmesi hatalı.')
+    throw new Error('Invalid format pairing.')
   }
 
   onStatus('queued')
@@ -153,7 +172,7 @@ async function runMockConversion(
     return {
       status: 'requires_server',
       progress: 100,
-      message: 'Bu dönüşüm için backend motoru gerekir.',
+      message: 'This conversion requires a backend engine.',
     }
   }
 
@@ -183,7 +202,7 @@ async function convertImage(
 
     const context = canvas.getContext('2d')
     if (!context) {
-      throw new Error('Canvas hazır değil.')
+      throw new Error('Canvas is not available.')
     }
 
     if (targetFormat === 'jpg') {
@@ -231,7 +250,7 @@ function transformText(sourceText: string, sourceFormat: string, targetFormat: s
   if (targetFormat === 'html') {
     const title = sourceFormat === 'md' ? 'Markdown export' : 'Text export'
     return `<!doctype html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>${title}</title>
@@ -258,7 +277,7 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
     image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error('Görsel okunamadı.'))
+    image.onerror = () => reject(new Error('Image could not be read.'))
     image.src = url
   })
 }
@@ -272,7 +291,7 @@ function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality: numb
           return
         }
 
-        reject(new Error('Çıktı üretilemedi.'))
+        reject(new Error('Output could not be generated.'))
       },
       mimeType,
       quality,

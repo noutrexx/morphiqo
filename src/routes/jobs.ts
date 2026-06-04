@@ -8,7 +8,7 @@ jobsRouter.get('/jobs/:jobId', (req, res) => {
   const job = getJob(req.params.jobId)
 
   if (!job) {
-    res.status(404).json({ message: 'Job bulunamadı.' })
+    res.status(404).json({ message: 'Job not found.' })
     return
   }
 
@@ -19,12 +19,12 @@ jobsRouter.get('/jobs/:jobId/download', (req, res) => {
   const job = getJob(req.params.jobId)
 
   if (!job) {
-    res.status(404).json({ message: 'Job bulunamadı.' })
+    res.status(404).json({ message: 'Job not found.' })
     return
   }
 
   if (job.status !== 'completed' || !job.outputPath || !fs.existsSync(job.outputPath)) {
-    res.status(404).json({ message: 'Çıktı dosyası hazır değil.' })
+    res.status(404).json({ message: 'Output file is not ready.' })
     return
   }
 

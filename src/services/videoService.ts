@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+import { runCommand } from './commandRunner.js'
 
 interface ConvertVideoOptions {
   inputPath: string
@@ -6,26 +6,8 @@ interface ConvertVideoOptions {
 }
 
 export async function convertVideoOrAudio({ inputPath, outputPath }: ConvertVideoOptions): Promise<void> {
-  await runCommand('ffmpeg', ['-y', '-i', inputPath, outputPath])
-}
-
-function runCommand(command: string, args: string[]): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { shell: false })
-
-    let errorText = ''
-    child.stderr.on('data', (chunk: Buffer) => {
-      errorText += chunk.toString()
-    })
-
-    child.on('error', () => reject(new Error('FFmpeg yüklü değil veya çalıştırılamadı.')))
-    child.on('close', (code) => {
-      if (code === 0) {
-        resolve()
-        return
-      }
-
-      reject(new Error(errorText || 'FFmpeg dönüşümü başarısız.'))
-    })
+  await runCommand('ffmpeg', ['-y', '-i', inputPath, outputPath], {
+    missingMessage: 'FFmpeg must be installed for this conversion.',
+    failureMessage: 'FFmpeg conversion failed.',
   })
 }

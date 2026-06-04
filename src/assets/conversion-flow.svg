@@ -1,0 +1,29 @@
+<svg width="560" height="260" viewBox="0 0 560 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="File conversion flow illustration">
+  <rect width="560" height="260" rx="22" fill="#0B1117"/>
+  <rect x="1" y="1" width="558" height="258" rx="21" stroke="#94A3B8" stroke-opacity="0.14" stroke-width="2"/>
+  <g opacity="0.52">
+    <circle cx="109" cy="130" r="64" fill="#14B8A6" fill-opacity="0.1"/>
+    <circle cx="451" cy="130" r="64" fill="#34D399" fill-opacity="0.08"/>
+  </g>
+  <rect x="62" y="70" width="118" height="120" rx="14" fill="#121A22" stroke="#2DD4BF" stroke-opacity="0.28"/>
+  <path d="M93 100C93 96.6863 95.6863 94 99 94H125L149 118V160C149 163.314 146.314 166 143 166H99C95.6863 166 93 163.314 93 160V100Z" fill="#0F171E" stroke="#CCFBF1" stroke-opacity="0.72" stroke-width="3"/>
+  <path d="M125 94V113C125 115.761 127.239 118 130 118H149" stroke="#CCFBF1" stroke-opacity="0.72" stroke-width="3"/>
+  <rect x="91" y="202" width="60" height="24" rx="6" fill="#10231F" stroke="#2DD4BF" stroke-opacity="0.22"/>
+  <text x="121" y="219" text-anchor="middle" fill="#99F6E4" font-family="Inter, Arial" font-size="12" font-weight="800">INPUT</text>
+  <path d="M207 130H342" stroke="#2DD4BF" stroke-opacity="0.55" stroke-width="3" stroke-linecap="round"/>
+  <path d="M342 130L328 116M342 130L328 144" stroke="#2DD4BF" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="218" y="96" width="112" height="68" rx="12" fill="#101820" stroke="#94A3B8" stroke-opacity="0.14"/>
+  <path d="M246 130H301" stroke="#5EEAD4" stroke-opacity="0.8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M266 112L246 130L266 148" stroke="#5EEAD4" stroke-opacity="0.72" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M281 112L301 130L281 148" stroke="#5EEAD4" stroke-opacity="0.72" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="380" y="70" width="118" height="120" rx="14" fill="#121A22" stroke="#34D399" stroke-opacity="0.26"/>
+  <path d="M409 101C409 97.6863 411.686 95 415 95H446L470 119V159C470 162.314 467.314 165 464 165H415C411.686 165 409 162.314 409 159V101Z" fill="#0F171E" stroke="#D1FAE5" stroke-opacity="0.74" stroke-width="3"/>
+  <path d="M446 95V114C446 116.761 448.239 119 451 119H470" stroke="#D1FAE5" stroke-opacity="0.74" stroke-width="3"/>
+  <path d="M424 141H455" stroke="#34D399" stroke-width="4" stroke-linecap="round"/>
+  <path d="M424 153H445" stroke="#34D399" stroke-opacity="0.72" stroke-width="4" stroke-linecap="round"/>
+  <rect x="410" y="202" width="64" height="24" rx="6" fill="#10231F" stroke="#34D399" stroke-opacity="0.22"/>
+  <text x="442" y="219" text-anchor="middle" fill="#BBF7D0" font-family="Inter, Arial" font-size="12" font-weight="800">OUTPUT</text>
+  <circle cx="274" cy="52" r="6" fill="#2DD4BF"/>
+  <circle cx="294" cy="52" r="6" fill="#34D399"/>
+  <circle cx="314" cy="52" r="6" fill="#F59E0B"/>
+</svg>

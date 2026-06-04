@@ -1,0 +1,55 @@
+<svg width="720" height="300" viewBox="0 0 720 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Conversion engine pipeline">
+  <rect width="720" height="300" rx="24" fill="#0B1117"/>
+  <rect x="1" y="1" width="718" height="298" rx="23" stroke="#94A3B8" stroke-opacity="0.14" stroke-width="2"/>
+  <rect x="34" y="34" width="652" height="232" rx="18" fill="#0F171E" stroke="#94A3B8" stroke-opacity="0.1"/>
+  <path d="M112 150H608" stroke="#2DD4BF" stroke-opacity="0.22" stroke-width="3" stroke-linecap="round"/>
+  <path d="M590 150L574 134M590 150L574 166" stroke="#5EEAD4" stroke-opacity="0.7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g>
+    <rect x="62" y="106" width="118" height="88" rx="14" fill="#121D25" stroke="#2DD4BF" stroke-opacity="0.28"/>
+    <path d="M97 132H132M132 132L121 121M132 132L121 143" stroke="#99F6E4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="121" y="169" text-anchor="middle" fill="#CCFBF1" font-family="Inter, Arial" font-size="14" font-weight="800">Input</text>
+  </g>
+  <g>
+    <rect x="224" y="56" width="132" height="64" rx="14" fill="#101A21" stroke="#34D399" stroke-opacity="0.22"/>
+    <circle cx="252" cy="88" r="8" fill="#34D399"/>
+    <text x="274" y="93" fill="#D1FAE5" font-family="Inter, Arial" font-size="14" font-weight="800">Sharp</text>
+    <text x="274" y="108" fill="#91A19F" font-family="Inter, Arial" font-size="11">images</text>
+  </g>
+  <g>
+    <rect x="224" y="136" width="132" height="64" rx="14" fill="#101A21" stroke="#2DD4BF" stroke-opacity="0.22"/>
+    <circle cx="252" cy="168" r="8" fill="#2DD4BF"/>
+    <text x="274" y="173" fill="#CCFBF1" font-family="Inter, Arial" font-size="14" font-weight="800">FFmpeg</text>
+    <text x="274" y="188" fill="#91A19F" font-family="Inter, Arial" font-size="11">media</text>
+  </g>
+  <g>
+    <rect x="224" y="216" width="132" height="64" rx="14" fill="#101A21" stroke="#F59E0B" stroke-opacity="0.2"/>
+    <circle cx="252" cy="248" r="8" fill="#F59E0B"/>
+    <text x="274" y="253" fill="#FEF3C7" font-family="Inter, Arial" font-size="14" font-weight="800">Office</text>
+    <text x="274" y="268" fill="#91A19F" font-family="Inter, Arial" font-size="11">docs</text>
+  </g>
+  <g>
+    <rect x="406" y="84" width="132" height="64" rx="14" fill="#101A21" stroke="#2DD4BF" stroke-opacity="0.2"/>
+    <circle cx="434" cy="116" r="8" fill="#2DD4BF"/>
+    <text x="456" y="121" fill="#CCFBF1" font-family="Inter, Arial" font-size="14" font-weight="800">Pandoc</text>
+    <text x="456" y="136" fill="#91A19F" font-family="Inter, Arial" font-size="11">text</text>
+  </g>
+  <g>
+    <rect x="406" y="172" width="132" height="64" rx="14" fill="#101A21" stroke="#34D399" stroke-opacity="0.2"/>
+    <circle cx="434" cy="204" r="8" fill="#34D399"/>
+    <text x="456" y="209" fill="#D1FAE5" font-family="Inter, Arial" font-size="14" font-weight="800">7zip</text>
+    <text x="456" y="224" fill="#91A19F" font-family="Inter, Arial" font-size="11">archives</text>
+  </g>
+  <g>
+    <rect x="584" y="106" width="76" height="88" rx="14" fill="#10231F" stroke="#34D399" stroke-opacity="0.26"/>
+    <path d="M608 146H639" stroke="#BBF7D0" stroke-width="4" stroke-linecap="round"/>
+    <path d="M608 160H631" stroke="#BBF7D0" stroke-opacity="0.72" stroke-width="4" stroke-linecap="round"/>
+    <text x="622" y="214" text-anchor="middle" fill="#BBF7D0" font-family="Inter, Arial" font-size="13" font-weight="800">Output</text>
+  </g>
+  <path d="M180 150C202 150 199 88 224 88" stroke="#34D399" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round"/>
+  <path d="M180 150H224" stroke="#2DD4BF" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round"/>
+  <path d="M180 150C202 150 199 248 224 248" stroke="#F59E0B" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M356 88C382 88 380 116 406 116" stroke="#2DD4BF" stroke-opacity="0.26" stroke-width="3" stroke-linecap="round"/>
+  <path d="M356 168C382 168 380 204 406 204" stroke="#34D399" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M538 116C558 116 558 150 584 150" stroke="#2DD4BF" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M538 204C558 204 558 150 584 150" stroke="#34D399" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+</svg>

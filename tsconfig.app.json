@@ -6,6 +6,11 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -26,9 +31,13 @@
     "src/server.ts",
     "src/routes",
     "src/jobs",
+    "src/services/archiveService.ts",
+    "src/services/commandRunner.ts",
     "src/config/formats.ts",
     "src/services/conversionService.ts",
+    "src/services/engineHealthService.ts",
     "src/services/imageService.ts",
+    "src/services/pdfService.ts",
     "src/services/videoService.ts",
     "src/services/documentService.ts",
     "src/utils/files.ts"

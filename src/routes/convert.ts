@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
+import { rm } from 'node:fs/promises'
 import express from 'express'
 import multer from 'multer'
 import {
@@ -30,24 +31,51 @@ const upload = multer({
 
 export const convertRouter = express.Router()
 
-convertRouter.post('/convert', upload.single('file'), (req, res) => {
+convertRouter.post('/convert', upload.single('file'), async (req, res) => {
   const file = req.file
   const targetFormat = normalizeFormat(String(req.body.targetFormat ?? ''))
 
+  const failValidation = async (message: string) => {
+    if (file?.path) {
+      await rm(file.path, { force: true })
+    }
+    res.status(400).json({ message })
+  }
+
   if (!file) {
-    res.status(400).json({ message: 'Dosya gönderilmedi.' })
+    res.status(400).json({ message: 'No file was uploaded.' })
     return
   }
 
   const sourceFormat = getFormatFromFileName(file.originalname)
 
-  if (!isSupportedFormat(sourceFormat) || !isSupportedFormat(targetFormat)) {
-    res.status(400).json({ message: 'Desteklenmeyen format.' })
+  if (!targetFormat) {
+    await failValidation('Target format was not selected.')
+    return
+  }
+
+  if (!isSupportedFormat(sourceFormat)) {
+    await failValidation('Source format is not supported.')
+    return
+  }
+
+  if (!isSupportedFormat(targetFormat)) {
+    await failValidation('Target format is not supported.')
+    return
+  }
+
+  if (sourceFormat === targetFormat) {
+    await failValidation('Source and target format cannot match.')
+    return
+  }
+
+  if (!hasExpectedMimeType(file.mimetype, sourceFormat)) {
+    await failValidation('File type does not match the extension.')
     return
   }
 
   if (!isAllowedConversion(sourceFormat, targetFormat)) {
-    res.status(400).json({ message: 'Kaynak ve hedef format uyumsuz.' })
+    await failValidation('Source and target must be in the same category.')
     return
   }
 
@@ -65,7 +93,7 @@ convertRouter.post('/convert', upload.single('file'), (req, res) => {
     status: 'queued',
     progress: 0,
     inputPath: path.resolve(file.path),
-    message: 'İş kuyruğa alındı.',
+    message: 'Is kuyruga alindi.',
   })
 
   void startConversion({
@@ -78,3 +106,14 @@ convertRouter.post('/convert', upload.single('file'), (req, res) => {
 
   res.status(202).json(toPublicJob(job))
 })
+
+function hasExpectedMimeType(mimeType: string, sourceFormat: string): boolean {
+  const expectedMimeTypes: Record<string, string[]> = {
+    jpg: ['image/jpeg'],
+    png: ['image/png'],
+    webp: ['image/webp'],
+  }
+  const allowedMimeTypes = expectedMimeTypes[sourceFormat]
+
+  return !allowedMimeTypes || allowedMimeTypes.includes(mimeType)
+}

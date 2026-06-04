@@ -1,6 +1,7 @@
 import { Download, RotateCcw } from 'lucide-react'
 import { JobStatusBadge } from './JobStatusBadge'
 import { ProgressBar } from './ProgressBar'
+import { Button } from './ui/button'
 import type { ConversionJob } from '../types/converter'
 import { formatBytes } from '../utils/file'
 
@@ -14,10 +15,10 @@ export function ConversionQueue({ jobs, onDownload, onRetry }: ConversionQueuePr
   const visibleJobs = jobs.slice(0, 6)
 
   return (
-    <section className="conversion-list" aria-label="Dönüşüm kuyruğu">
+    <section className="conversion-list" aria-label="Conversion queue">
       <div className="section-heading">
         <span className="eyebrow">Queue</span>
-        <strong>{visibleJobs.length ? 'Dönüşüm listesi' : 'Henüz işlem yok'}</strong>
+        <strong>{visibleJobs.length ? 'Conversion jobs' : 'No jobs yet'}</strong>
       </div>
 
       {visibleJobs.length ? (
@@ -28,7 +29,7 @@ export function ConversionQueue({ jobs, onDownload, onRetry }: ConversionQueuePr
                 <div>
                   <strong>{job.fileName}</strong>
                   <span>
-                    {job.sourceFormat.toUpperCase()} → {job.targetFormat.toUpperCase()} · {formatBytes(job.size)}
+                    {job.sourceFormat.toUpperCase()} {'->'} {job.targetFormat.toUpperCase()} - {formatBytes(job.size)}
                   </span>
                 </div>
                 <JobStatusBadge status={job.status} />
@@ -37,23 +38,23 @@ export function ConversionQueue({ jobs, onDownload, onRetry }: ConversionQueuePr
               <ProgressBar value={job.progress} />
 
               <div className="conversion-row__bottom">
-                <small>{job.message ?? 'Hazır'}</small>
+                <small>{job.message ?? 'Ready'}</small>
                 <div className="row-actions">
                   {job.status === 'failed' ? (
-                    <button className="download-button" type="button" onClick={() => onRetry(job)}>
+                    <Button className="download-button" type="button" onClick={() => onRetry(job)}>
                       <RotateCcw size={15} />
                       Retry
-                    </button>
+                    </Button>
                   ) : (
-                    <button
+                    <Button
                       className="download-button"
                       type="button"
                       disabled={job.status !== 'completed' || !job.downloadUrl}
                       onClick={() => onDownload(job)}
                     >
                       <Download size={15} />
-                      İndir
-                    </button>
+                      Download
+                    </Button>
                   )}
                 </div>
               </div>
@@ -61,8 +62,8 @@ export function ConversionQueue({ jobs, onDownload, onRetry }: ConversionQueuePr
           ))}
         </div>
       ) : (
-        <div className="empty-state">
-          <p>Dönüşüm başlayınca progress burada görünür.</p>
+        <div className="empty-state empty-state--soft">
+          <p>Progress appears here when a conversion starts.</p>
         </div>
       )}
     </section>
