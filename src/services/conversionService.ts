@@ -50,7 +50,7 @@ async function runConversion({
   } else if (category === 'Video' || category === 'Audio') {
     await convertVideoOrAudio({ inputPath, outputPath })
   } else if (category === 'Document' || category === 'Spreadsheet' || category === 'Presentation') {
-    await convertDocument({ inputPath, outputDir: path.dirname(outputPath), targetFormat })
+    await convertDocument({ inputPath, outputPath, targetFormat })
   } else {
     throw new Error('Bu dönüşüm motoru henüz hazır değil.')
   }

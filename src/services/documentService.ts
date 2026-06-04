@@ -1,16 +1,19 @@
 import { spawn } from 'node:child_process'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
 interface ConvertDocumentOptions {
   inputPath: string
-  outputDir: string
+  outputPath: string
   targetFormat: string
 }
 
 export async function convertDocument({
   inputPath,
-  outputDir,
+  outputPath,
   targetFormat,
 }: ConvertDocumentOptions): Promise<void> {
+  const outputDir = path.dirname(outputPath)
   await runCommand('libreoffice', [
     '--headless',
     '--convert-to',
@@ -19,6 +22,9 @@ export async function convertDocument({
     outputDir,
     inputPath,
   ])
+
+  const generatedPath = path.join(outputDir, `${path.parse(inputPath).name}.${targetFormat}`)
+  await fs.rename(generatedPath, outputPath)
 }
 
 function runCommand(command: string, args: string[]): Promise<void> {

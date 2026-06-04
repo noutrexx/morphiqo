@@ -28,7 +28,9 @@ app.get('/api/formats', (_req, res) => {
 app.use('/api', convertRouter)
 app.use('/api', jobsRouter)
 
-app.use((error: unknown, _req: express.Request, res: express.Response) => {
+app.use((error: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  void next
+
   if (error instanceof Error && error.message.includes('File too large')) {
     res.status(413).json({ message: 'Dosya boyutu 100 MB sınırını aşıyor.' })
     return
