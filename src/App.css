@@ -287,6 +287,7 @@
   background: var(--accent-soft);
 }
 
+.pair-alert--server,
 .pair-alert--server-required {
   border-color: #f2d194;
   color: var(--warning);
@@ -457,23 +458,25 @@
   white-space: nowrap;
 }
 
-.status-badge--success,
+.status-badge--completed,
 .status-badge--ready {
   color: var(--success);
   background: var(--success-soft);
 }
 
-.status-badge--converting svg {
+.status-badge--uploading svg,
+.status-badge--processing svg {
   animation: spin 900ms linear infinite;
 }
 
+.status-badge--requires_server,
 .status-badge--server-required,
 .status-badge--queued {
   color: var(--warning);
   background: var(--warning-soft);
 }
 
-.status-badge--error,
+.status-badge--failed,
 .status-badge--invalid {
   color: var(--danger);
   background: var(--danger-soft);

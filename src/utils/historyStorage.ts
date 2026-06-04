@@ -34,7 +34,7 @@ export function clearStoredHistory(): void {
   window.localStorage.removeItem(HISTORY_KEY)
 }
 
-export function limitHistory(records: ConversionRecord[]): ConversionRecord[] {
+export function limitHistory<T>(records: T[]): T[] {
   return records.slice(0, HISTORY_LIMIT)
 }
 

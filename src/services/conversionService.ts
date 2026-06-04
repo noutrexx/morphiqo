@@ -1,23 +1,28 @@
-import { getConversionMode, normalizeFormat } from '../data/formats'
-import type { BrowserConversionResult } from '../types/converter'
+import { getConversionMode, normalizeFormat } from '../config/conversionRules'
+import type { BrowserConversionResult, ConversionRequest, ConversionResult } from '../types/converter'
 import { createOutputFileName, escapeHtml } from '../utils/file'
 
-interface ConvertFileOptions {
-  file: File
-  sourceFormat: string
-  targetFormat: string
+interface RunConversionOptions {
+  request: ConversionRequest
   onProgress: (progress: number) => void
+  onStatus: (status: ConversionResult['status'], message?: string) => void
 }
 
-type ConversionServiceResult =
-  | {
-      kind: 'download'
-      result: BrowserConversionResult
-    }
-  | {
-      kind: 'server-required'
-      message: string
-    }
+interface ApiJobResponse {
+  jobId: string
+  status?: ConversionResult['status']
+  progress?: number
+  fileName?: string
+  message?: string
+}
+
+interface ApiStatusResponse {
+  jobId: string
+  status: ConversionResult['status']
+  progress?: number
+  fileName?: string
+  message?: string
+}
 
 const imageMimeTypes: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -25,43 +30,140 @@ const imageMimeTypes: Record<string, string> = {
   webp: 'image/webp',
 }
 
-export async function convertFile({
-  file,
-  sourceFormat,
-  targetFormat,
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? ''
+
+export async function runConversion({
+  request,
   onProgress,
-}: ConvertFileOptions): Promise<ConversionServiceResult> {
+  onStatus,
+}: RunConversionOptions): Promise<ConversionResult> {
+  if (apiBaseUrl) {
+    try {
+      return await runApiConversion(request, onProgress, onStatus)
+    } catch (error) {
+      if (!import.meta.env.DEV) {
+        throw error
+      }
+
+      onStatus('processing', 'API bulunamadı, mock çalışıyor.')
+      return runMockConversion(request, onProgress, onStatus)
+    }
+  }
+
+  return runMockConversion(request, onProgress, onStatus)
+}
+
+async function runApiConversion(
+  request: ConversionRequest,
+  onProgress: (progress: number) => void,
+  onStatus: (status: ConversionResult['status'], message?: string) => void,
+): Promise<ConversionResult> {
+  const formData = new FormData()
+  formData.append('file', request.file)
+  formData.append('sourceFormat', request.sourceFormat)
+  formData.append('targetFormat', request.targetFormat)
+
+  onStatus('uploading')
+  onProgress(12)
+
+  const createResponse = await fetch(`${apiBaseUrl}/api/convert`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!createResponse.ok) {
+    throw new Error('Dosya backend servisine yüklenemedi.')
+  }
+
+  const createdJob = (await createResponse.json()) as ApiJobResponse
+  onStatus('processing', createdJob.message)
+  onProgress(createdJob.progress ?? 25)
+
+  const completedJob = await pollJob(createdJob.jobId, onProgress, onStatus)
+
+  if (completedJob.status === 'failed') {
+    throw new Error(completedJob.message ?? 'Dönüşüm başarısız oldu.')
+  }
+
+  if (completedJob.status === 'requires_server') {
+    return {
+      jobId: completedJob.jobId,
+      status: 'requires_server',
+      progress: completedJob.progress ?? 100,
+      message: completedJob.message ?? 'Bu işlem backend motoru ister.',
+    }
+  }
+
+  return {
+    jobId: completedJob.jobId,
+    status: 'completed',
+    progress: 100,
+    outputName: completedJob.fileName ?? createOutputFileName(request.file.name, request.targetFormat),
+    downloadUrl: `${apiBaseUrl}/api/jobs/${completedJob.jobId}/download`,
+    message: completedJob.message ?? 'Dönüşüm tamamlandı.',
+  }
+}
+
+async function pollJob(
+  jobId: string,
+  onProgress: (progress: number) => void,
+  onStatus: (status: ConversionResult['status'], message?: string) => void,
+): Promise<ApiStatusResponse> {
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    await wait(900)
+
+    const statusResponse = await fetch(`${apiBaseUrl}/api/jobs/${jobId}`)
+    if (!statusResponse.ok) {
+      throw new Error('İş durumu okunamadı.')
+    }
+
+    const job = (await statusResponse.json()) as ApiStatusResponse
+    onStatus(job.status, job.message)
+    onProgress(job.progress ?? 40)
+
+    if (job.status === 'completed' || job.status === 'failed' || job.status === 'requires_server') {
+      return job
+    }
+  }
+
+  throw new Error('Dönüşüm çok uzun sürdü.')
+}
+
+async function runMockConversion(
+  request: ConversionRequest,
+  onProgress: (progress: number) => void,
+  onStatus: (status: ConversionResult['status'], message?: string) => void,
+): Promise<ConversionResult> {
+  const { file, sourceFormat, targetFormat } = request
   const source = normalizeFormat(sourceFormat)
   const target = normalizeFormat(targetFormat)
   const mode = getConversionMode(source, target)
 
   if (mode === 'invalid') {
-    throw new Error('Hatalı format eşleşmesi.')
+    throw new Error('Format eşleşmesi hatalı.')
   }
 
-  onProgress(18)
+  onStatus('queued')
+  onProgress(8)
   await wait(260)
+  onStatus('processing')
 
-  if (mode === 'server-required') {
+  if (mode === 'server') {
     onProgress(100)
     return {
-      kind: 'server-required',
-      message: 'server conversion required',
+      status: 'requires_server',
+      progress: 100,
+      message: 'Bu dönüşüm için backend motoru gerekir.',
     }
   }
 
   if (mode === 'browser' && isBrowserImagePair(source, target)) {
     const result = await convertImage(file, target, onProgress)
-    return { kind: 'download', result }
+    return toCompletedResult(result)
   }
 
-  if (mode === 'browser') {
-    const result = await convertTextLikeFile(file, source, target, onProgress)
-    return { kind: 'download', result }
-  }
-
-  const result = await simulateDelimitedConversion(file, source, target, onProgress)
-  return { kind: 'download', result }
+  const result = await convertTextLikeFile(file, source, target, onProgress)
+  return toCompletedResult(result)
 }
 
 async function convertImage(
@@ -81,7 +183,7 @@ async function convertImage(
 
     const context = canvas.getContext('2d')
     if (!context) {
-      throw new Error('Canvas context oluşturulamadı.')
+      throw new Error('Canvas hazır değil.')
     }
 
     if (targetFormat === 'jpg') {
@@ -125,32 +227,6 @@ async function convertTextLikeFile(
   }
 }
 
-async function simulateDelimitedConversion(
-  file: File,
-  sourceFormat: string,
-  targetFormat: string,
-  onProgress: (progress: number) => void,
-): Promise<BrowserConversionResult> {
-  const sourceText = await file.text()
-  onProgress(64)
-
-  const sourceDelimiter = sourceFormat === 'tsv' ? '\t' : ','
-  const targetDelimiter = targetFormat === 'tsv' ? '\t' : ','
-  const convertedText = sourceText
-    .split(/\r?\n/)
-    .map((row) => row.split(sourceDelimiter).join(targetDelimiter))
-    .join('\n')
-
-  await wait(180)
-  onProgress(100)
-
-  return {
-    blob: new Blob([convertedText], { type: 'text/plain;charset=utf-8' }),
-    outputName: createOutputFileName(file.name, targetFormat),
-    message: 'Mock conversion complete',
-  }
-}
-
 function transformText(sourceText: string, sourceFormat: string, targetFormat: string): string {
   if (targetFormat === 'html') {
     const title = sourceFormat === 'md' ? 'Markdown export' : 'Text export'
@@ -182,7 +258,7 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
     image.onload = () => resolve(image)
-    image.onerror = () => reject(new Error('Görsel dosyası okunamadı.'))
+    image.onerror = () => reject(new Error('Görsel okunamadı.'))
     image.src = url
   })
 }
@@ -196,7 +272,7 @@ function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality: numb
           return
         }
 
-        reject(new Error('Canvas çıktısı üretilemedi.'))
+        reject(new Error('Çıktı üretilemedi.'))
       },
       mimeType,
       quality,
@@ -206,4 +282,16 @@ function canvasToBlob(canvas: HTMLCanvasElement, mimeType: string, quality: numb
 
 function wait(duration: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, duration))
+}
+
+function toCompletedResult(result: BrowserConversionResult): ConversionResult {
+  const downloadUrl = URL.createObjectURL(result.blob)
+
+  return {
+    status: 'completed',
+    progress: 100,
+    outputName: result.outputName,
+    downloadUrl,
+    message: result.message,
+  }
 }

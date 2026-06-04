@@ -20,7 +20,7 @@ export function FormatReference({ activeFile, pairMessage }: FormatReferenceProp
         </div>
         <div className="detail-block">
           <span className="detail-icon">
-            {mode === 'server-required' ? <ServerCog size={18} /> : <Sparkles size={18} />}
+            {mode === 'server' ? <ServerCog size={18} /> : <Sparkles size={18} />}
           </span>
           <div>
             <strong>{pairMessage}</strong>

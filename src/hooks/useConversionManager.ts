@@ -9,8 +9,8 @@ import {
   MAX_FILE_SIZE_BYTES,
   normalizeFormat,
 } from '../data/formats'
-import { convertFile } from '../services/conversionService'
-import type { ConversionRecord, UploadedFileItem } from '../types/converter'
+import { runConversion } from '../services/conversionService'
+import type { ConversionJob, ConversionRecord, UploadedFileItem } from '../types/converter'
 import { createId, downloadBlobUrl, formatBytes } from '../utils/file'
 import {
   clearStoredHistory,
@@ -22,7 +22,7 @@ import {
 export function useConversionManager() {
   const [files, setFiles] = useState<UploadedFileItem[]>([])
   const [activeFileId, setActiveFileId] = useState<string | undefined>()
-  const [conversions, setConversions] = useState<ConversionRecord[]>(() => loadStoredHistory())
+  const [jobs, setJobs] = useState<ConversionJob[]>(() => loadStoredHistory().map(toJob))
   const downloadUrlsRef = useRef(new Set<string>())
 
   const activeFile = useMemo(
@@ -34,16 +34,15 @@ export function useConversionManager() {
     ? getPairMessage(activeFile.sourceFormat, activeFile.targetFormat)
     : 'Dosya bekleniyor.'
 
-  const isConverting = conversions.some((conversion) => conversion.status === 'converting')
+  const isConverting = jobs.some((job) => job.status === 'uploading' || job.status === 'processing')
   const canConvert =
     Boolean(activeFile) &&
     activeFile?.status === 'ready' &&
-    getConversionMode(activeFile.sourceFormat, activeFile.targetFormat) !== 'invalid' &&
-    !isConverting
+    getConversionMode(activeFile.sourceFormat, activeFile.targetFormat) !== 'invalid'
 
   useEffect(() => {
-    saveStoredHistory(conversions)
-  }, [conversions])
+    saveStoredHistory(jobs.map(toRecord))
+  }, [jobs])
 
   useEffect(() => {
     const downloadUrls = downloadUrlsRef.current
@@ -119,111 +118,156 @@ export function useConversionManager() {
     [activeFile],
   )
 
-  const convertActiveFile = useCallback(async () => {
-    if (!activeFile) {
-      return
-    }
-
-    const mode = getConversionMode(activeFile.sourceFormat, activeFile.targetFormat)
-    const baseRecord: ConversionRecord = {
-      id: createId('conversion'),
-      fileName: activeFile.name,
-      size: activeFile.size,
-      sourceFormat: activeFile.sourceFormat,
-      targetFormat: activeFile.targetFormat,
-      category: getCategoryForFormat(activeFile.sourceFormat),
-      status: mode === 'invalid' ? 'invalid' : 'converting',
-      progress: mode === 'invalid' ? 0 : 8,
-      createdAt: Date.now(),
-      message: mode === 'invalid' ? getPairMessage(activeFile.sourceFormat, activeFile.targetFormat) : undefined,
-    }
-
-    setConversions((currentConversions) => limitHistory([baseRecord, ...currentConversions]))
-
+  const startJob = useCallback(async (fileItem: UploadedFileItem, existingJobId?: string) => {
+    const mode = getConversionMode(fileItem.sourceFormat, fileItem.targetFormat)
     if (mode === 'invalid') {
+      const invalidJob = createJob(fileItem, 'failed', getPairMessage(fileItem.sourceFormat, fileItem.targetFormat))
+      setJobs((currentJobs) => limitHistory([invalidJob, ...currentJobs]).map(toJob))
       return
+    }
+
+    const job = createJob(fileItem, 'queued')
+    const jobId = existingJobId ?? job.id
+
+    if (existingJobId) {
+      setJobs((currentJobs) =>
+        currentJobs.map((currentJob) =>
+          currentJob.id === existingJobId
+            ? {
+                ...job,
+                id: existingJobId,
+                createdAt: currentJob.createdAt,
+              }
+            : currentJob,
+        ),
+      )
+    } else {
+      setJobs((currentJobs) => limitHistory([job, ...currentJobs]).map(toJob))
     }
 
     try {
-      const serviceResult = await convertFile({
-        file: activeFile.file,
-        sourceFormat: activeFile.sourceFormat,
-        targetFormat: activeFile.targetFormat,
+      const result = await runConversion({
+        request: {
+          file: fileItem.file,
+          sourceFormat: fileItem.sourceFormat,
+          targetFormat: fileItem.targetFormat,
+        },
         onProgress: (progress) => {
-          setConversions((currentConversions) =>
-            currentConversions.map((conversion) =>
-              conversion.id === baseRecord.id ? { ...conversion, progress } : conversion,
+          setJobs((currentJobs) =>
+            currentJobs.map((currentJob) =>
+              currentJob.id === jobId ? { ...currentJob, progress, updatedAt: Date.now() } : currentJob,
+            ),
+          )
+        },
+        onStatus: (status, message) => {
+          setJobs((currentJobs) =>
+            currentJobs.map((currentJob) =>
+              currentJob.id === jobId
+                ? {
+                    ...currentJob,
+                    status,
+                    message: message ?? currentJob.message,
+                    updatedAt: Date.now(),
+                  }
+                : currentJob,
             ),
           )
         },
       })
 
-      if (serviceResult.kind === 'server-required') {
-        setConversions((currentConversions) =>
-          currentConversions.map((conversion) =>
-            conversion.id === baseRecord.id
+      if (result.downloadUrl?.startsWith('blob:')) {
+        downloadUrlsRef.current.add(result.downloadUrl)
+      }
+
+      setJobs((currentJobs) =>
+        currentJobs.map((currentJob) =>
+          currentJob.id === jobId
+            ? {
+                ...currentJob,
+                apiJobId: result.jobId,
+                status: result.status,
+                progress: result.progress,
+                outputName: result.outputName,
+                downloadUrl: result.downloadUrl,
+                message: result.message,
+                updatedAt: Date.now(),
+              }
+            : currentJob,
+        ),
+      )
+    } catch (error) {
+      setJobs((currentJobs) =>
+        currentJobs.map((currentJob) =>
+          currentJob.id === jobId
+            ? {
+                ...currentJob,
+                status: 'failed',
+                progress: 100,
+                message: error instanceof Error ? error.message : 'Dönüşüm başarısız.',
+                updatedAt: Date.now(),
+              }
+            : currentJob,
+        ),
+      )
+    }
+  }, [])
+
+  const convertActiveFile = useCallback(() => {
+    if (!activeFile || activeFile.status !== 'ready') {
+      return
+    }
+
+    void startJob(activeFile)
+  }, [activeFile, startJob])
+
+  const convertAllFiles = useCallback(() => {
+    files.filter((file) => file.status === 'ready').forEach((file) => {
+      void startJob(file)
+    })
+  }, [files, startJob])
+
+  const retryJob = useCallback(
+    (job: ConversionJob) => {
+      const file = files.find((item) => item.id === job.fileId)
+      if (!file) {
+        setJobs((currentJobs) =>
+          currentJobs.map((item) =>
+            item.id === job.id
               ? {
-                  ...conversion,
-                  status: 'server-required',
-                  progress: 100,
-                  message: serviceResult.message,
+                  ...item,
+                  status: 'failed',
+                  message: 'Dosya tekrar yüklenmeli.',
+                  updatedAt: Date.now(),
                 }
-              : conversion,
+              : item,
           ),
         )
         return
       }
 
-      const downloadUrl = URL.createObjectURL(serviceResult.result.blob)
-      downloadUrlsRef.current.add(downloadUrl)
-      setConversions((currentConversions) =>
-        currentConversions.map((conversion) =>
-          conversion.id === baseRecord.id
-            ? {
-                ...conversion,
-                status: 'success',
-                progress: 100,
-                outputName: serviceResult.result.outputName,
-                downloadUrl,
-                message: serviceResult.result.message,
-              }
-            : conversion,
-        ),
-      )
-    } catch (error) {
-      setConversions((currentConversions) =>
-        currentConversions.map((conversion) =>
-          conversion.id === baseRecord.id
-            ? {
-                ...conversion,
-                status: 'error',
-                progress: 100,
-                message: error instanceof Error ? error.message : 'Dönüşüm başarısız.',
-              }
-            : conversion,
-        ),
-      )
-    }
-  }, [activeFile])
+      void startJob(file, job.id)
+    },
+    [files, startJob],
+  )
 
-  const downloadConversion = useCallback((conversion: ConversionRecord) => {
-    if (!conversion.downloadUrl || !conversion.outputName) {
+  const downloadConversion = useCallback((job: ConversionJob | ConversionRecord) => {
+    if (!job.downloadUrl || !job.outputName) {
       return
     }
 
-    downloadBlobUrl(conversion.downloadUrl, conversion.outputName)
+    downloadBlobUrl(job.downloadUrl, job.outputName)
   }, [])
 
   const clearHistory = useCallback(() => {
-    conversions.forEach((conversion) => {
-      if (conversion.downloadUrl) {
-        URL.revokeObjectURL(conversion.downloadUrl)
+    jobs.forEach((job) => {
+      if (job.downloadUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(job.downloadUrl)
       }
     })
     downloadUrlsRef.current.clear()
     clearStoredHistory()
-    setConversions([])
-  }, [conversions])
+    setJobs([])
+  }, [jobs])
 
   return {
     activeFile,
@@ -231,16 +275,42 @@ export function useConversionManager() {
     addFiles,
     canConvert,
     clearHistory,
-    conversions,
+    conversions: jobs,
     convertActiveFile,
+    convertAllFiles,
     downloadConversion,
     files,
     isConverting,
+    jobs,
     pairMessage,
     removeFile,
+    retryJob,
     selectFile,
     updateActiveSource,
     updateActiveTarget,
+  }
+}
+
+function createJob(
+  fileItem: UploadedFileItem,
+  status: ConversionJob['status'],
+  message?: string,
+): ConversionJob {
+  const now = Date.now()
+
+  return {
+    id: createId('job'),
+    fileId: fileItem.id,
+    fileName: fileItem.name,
+    size: fileItem.size,
+    sourceFormat: fileItem.sourceFormat,
+    targetFormat: fileItem.targetFormat,
+    category: getCategoryForFormat(fileItem.sourceFormat),
+    status,
+    progress: status === 'failed' ? 100 : 0,
+    createdAt: now,
+    updatedAt: now,
+    message,
   }
 }
 
@@ -265,5 +335,45 @@ function createUploadedFileItem(file: File): UploadedFileItem {
       : isUnsupported
         ? 'Desteklenmeyen format.'
         : undefined,
+  }
+}
+
+function toRecord(job: ConversionJob): ConversionRecord {
+  return {
+    id: job.id,
+    fileId: job.fileId,
+    fileName: job.fileName,
+    size: job.size,
+    sourceFormat: job.sourceFormat,
+    targetFormat: job.targetFormat,
+    category: job.category,
+    status: job.status,
+    progress: job.progress,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    apiJobId: job.apiJobId,
+    outputName: job.outputName,
+    downloadUrl: job.downloadUrl,
+    message: job.message,
+  }
+}
+
+function toJob(record: ConversionRecord): ConversionJob {
+  return {
+    id: record.id,
+    fileId: record.fileId ?? record.id,
+    fileName: record.fileName,
+    size: record.size,
+    sourceFormat: record.sourceFormat,
+    targetFormat: record.targetFormat,
+    category: record.category,
+    status: record.status,
+    progress: record.progress,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt ?? record.createdAt,
+    apiJobId: record.apiJobId,
+    outputName: record.outputName,
+    downloadUrl: record.downloadUrl,
+    message: record.message,
   }
 }

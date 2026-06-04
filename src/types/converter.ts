@@ -7,21 +7,23 @@ export type FormatCategory =
   | 'Video'
   | 'Archive'
 
-export type ConversionMode = 'browser' | 'simulated' | 'server-required' | 'invalid'
+export type SupportedFormat = string
+
+export type ConversionMode = 'browser' | 'mock' | 'server' | 'invalid'
 
 export type UploadStatus = 'ready' | 'invalid'
 
 export type ConversionStatus =
   | 'queued'
-  | 'converting'
-  | 'success'
-  | 'error'
-  | 'server-required'
-  | 'invalid'
+  | 'uploading'
+  | 'processing'
+  | 'completed'
+  | 'failed'
+  | 'requires_server'
 
 export interface FormatGroup {
   category: FormatCategory
-  formats: readonly string[]
+  formats: readonly SupportedFormat[]
 }
 
 export interface UploadedFileItem {
@@ -36,8 +38,42 @@ export interface UploadedFileItem {
   message?: string
 }
 
+export interface ConversionRequest {
+  file: File
+  sourceFormat: SupportedFormat
+  targetFormat: SupportedFormat
+}
+
+export interface ConversionResult {
+  jobId?: string
+  status: ConversionStatus
+  progress: number
+  outputName?: string
+  downloadUrl?: string
+  message?: string
+}
+
+export interface ConversionJob {
+  id: string
+  fileId: string
+  fileName: string
+  size: number
+  sourceFormat: SupportedFormat
+  targetFormat: SupportedFormat
+  category?: FormatCategory
+  status: ConversionStatus
+  progress: number
+  createdAt: number
+  updatedAt: number
+  apiJobId?: string
+  outputName?: string
+  downloadUrl?: string
+  message?: string
+}
+
 export interface ConversionRecord {
   id: string
+  fileId?: string
   fileName: string
   size: number
   sourceFormat: string
@@ -46,6 +82,8 @@ export interface ConversionRecord {
   status: ConversionStatus
   progress: number
   createdAt: number
+  updatedAt?: number
+  apiJobId?: string
   outputName?: string
   downloadUrl?: string
   message?: string

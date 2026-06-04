@@ -19,20 +19,22 @@ const labels: Record<BadgeStatus, string> = {
   ready: 'Ready',
   invalid: 'Invalid',
   queued: 'Queued',
-  converting: 'Converting',
-  success: 'Success',
-  error: 'Error',
-  'server-required': 'Server required',
+  uploading: 'Uploading',
+  processing: 'Processing',
+  completed: 'Completed',
+  failed: 'Failed',
+  requires_server: 'Server required',
 }
 
 const icons: Record<BadgeStatus, LucideIcon> = {
   ready: CheckCircle2,
   invalid: AlertTriangle,
   queued: Clock3,
-  converting: Loader2,
-  success: CheckCircle2,
-  error: XCircle,
-  'server-required': ServerCog,
+  uploading: Loader2,
+  processing: Loader2,
+  completed: CheckCircle2,
+  failed: XCircle,
+  requires_server: ServerCog,
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
