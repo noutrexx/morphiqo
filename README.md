@@ -13,21 +13,24 @@ Designed and vibe-coded by **noutrexx**.
 
 ## Preview
 
-![Morphiqo conversion workspace](./docs/screenshots/00-full-page.png)
+### Full page
 
-The main view keeps upload, target selection, workspace status, and engine information in one focused interface.
+The complete Morphiqo workspace, including the upload flow, format selection, workspace state, and engine section.
 
-## Screenshots
+![Morphiqo full page preview](./docs/screenshots/00-full-page.png)
 
-| Convert workspace | Core systems |
+### Product views
+
+| Convert workspace | Workspace detail |
 | --- | --- |
-| ![Upload and conversion workspace](./docs/screenshots/01-convert-workspace.png) | ![Engine and profile systems section](./docs/screenshots/02-systems.png) |
-| Upload files, choose compatible targets, and start conversion jobs. | Engine matrix, GitHub profile, and project ownership cards. |
+| Upload files, choose compatible targets, and start conversion jobs. | Review active uploads, quick output state, and local conversion history. |
+| <img src="./docs/screenshots/01-convert-workspace.png" alt="Upload and conversion workspace" width="420" /> | <img src="./docs/screenshots/03-workspace-detail.png" alt="Workspace detail and local history" width="420" /> |
 
-| Workspace detail |
-| --- |
-| ![Workspace detail and local history](./docs/screenshots/03-workspace-detail.png) |
-| Active uploads, quick output state, and local conversion history. |
+### Engine systems
+
+Engine matrix, GitHub profile, and project ownership cards.
+
+<img src="./docs/screenshots/02-systems.png" alt="Engine and profile systems section" width="640" />
 
 ## Highlights
 
