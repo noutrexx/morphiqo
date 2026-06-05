@@ -1,4 +1,4 @@
-﻿*.svg linguist-generated=true
+*.svg linguist-generated=true
 docs/screenshots/* linguist-documentation=true
 
 # Keep tiny generated/support languages out of GitHub language stats.
