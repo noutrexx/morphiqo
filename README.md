@@ -14,21 +14,21 @@ Designed and vibe-coded by **noutrexx**.
 ## Preview
 
 <p align="center">
-  <img src="./docs/screenshots/01-convert-workspace.png" alt="Morphiqo desktop convert workspace" width="900" />
+  <img src="./docs/screenshots/05-converter-first-desktop.png" alt="Morphiqo converter-first desktop workspace" width="900" />
 </p>
 
-The preview shows the main desktop conversion workspace: upload, compatible target formats, queue actions, and local job state.
+The preview shows the converter-first desktop workspace: upload, compatible target formats, queue actions, and local job state before the product story sections.
 
 <br />
 
 ### Additional views
 
 <p align="center">
-  <img src="./docs/screenshots/04-mobile-convert.png" alt="Morphiqo mobile convert workspace" width="260" />
+  <img src="./docs/screenshots/06-converter-first-mobile.png" alt="Morphiqo converter-first mobile workspace" width="260" />
 </p>
 
 <p align="center">
-  Mobile view of the main conversion flow.
+  Mobile view of the converter-first flow.
 </p>
 
 <br />

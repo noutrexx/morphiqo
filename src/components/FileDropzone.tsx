@@ -58,7 +58,7 @@ export function FileDropzone({ onAddFiles }: FileDropzoneProps) {
       </Button>
       <div>
         <h2>Browse Files</h2>
-        <p>Drag and drop files here or choose them from your device.</p>
+        <p>Drag files here or choose them from your device to start the conversion flow.</p>
         <div className="dropzone__meta" aria-label="Upload constraints">
           <span>Images</span>
           <span>Documents</span>

@@ -5,6 +5,12 @@ import { Card } from './ui/card'
 import type { ConversionJob, UploadedFileItem } from '../types/converter'
 import { formatBytes } from '../utils/file'
 
+const quickRecipes = [
+  'PNG -> WEBP',
+  'PDF -> DOCX',
+  'JPG -> PNG',
+]
+
 interface ConversionHistoryProps {
   activeFileId?: string
   files: UploadedFileItem[]
@@ -54,10 +60,18 @@ export function ConversionHistory({
             </span>
             <div>
               <strong>1. Add a file</strong>
-              <p>2. Pick a target, 3. convert, then download the result.</p>
+              <p>2. Pick a target, 3. convert, 4. download from local history.</p>
             </div>
           </article>
         )}
+
+        {!files.length ? (
+          <div className="recipe-strip" aria-label="Example conversions">
+            {quickRecipes.map((recipe) => (
+              <span key={recipe}>{recipe}</span>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="panel-section">
@@ -146,7 +160,7 @@ export function ConversionHistory({
           </div>
         ) : (
           <div className="empty-state empty-state--soft">
-            <p>The latest 12 jobs are stored here.</p>
+            <p>The latest 12 conversion jobs are stored here locally.</p>
           </div>
         )}
       </section>
