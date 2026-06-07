@@ -34,11 +34,21 @@ The preview shows the centered glass converter: drag and drop, source and target
 <br />
 
 <p align="center">
-  <img src="./docs/screenshots/02-systems.png" alt="Morphiqo engine systems section" width="720" />
+  <img src="./docs/screenshots/11-visual-product-story.png" alt="Morphiqo visual product story section" width="900" />
 </p>
 
 <p align="center">
-  Engine systems section with conversion engines, GitHub profile, and ownership cards.
+  Product story section with a custom file-conversion portal visual.
+</p>
+
+<br />
+
+<p align="center">
+  <img src="./docs/screenshots/12-visual-engine-systems.png" alt="Morphiqo visual engine systems section" width="900" />
+</p>
+
+<p align="center">
+  Engine systems section with a custom routing-network visual.
 </p>
 
 ## Highlights
