@@ -14,21 +14,21 @@ Designed and vibe-coded by **noutrexx**.
 ## Preview
 
 <p align="center">
-  <img src="./docs/screenshots/07-transparent-converter-desktop.png" alt="Morphiqo transparent converter desktop workspace" width="900" />
+  <img src="./docs/screenshots/09-centered-glass-desktop.png" alt="Morphiqo centered glass converter desktop workspace" width="900" />
 </p>
 
-The preview shows the converter-first desktop workspace with its modern transparent interface: upload, compatible target formats, queue actions, and local job state before the product story sections.
+The preview shows the centered glass converter: drag and drop, source and target format selectors, engine status, and the primary conversion action all fit in the first viewport.
 
 <br />
 
 ### Additional views
 
 <p align="center">
-  <img src="./docs/screenshots/08-transparent-converter-mobile.png" alt="Morphiqo transparent converter mobile workspace" width="260" />
+  <img src="./docs/screenshots/10-centered-glass-mobile.png" alt="Morphiqo centered glass converter mobile workspace" width="300" />
 </p>
 
 <p align="center">
-  Mobile view of the transparent converter-first flow.
+  Responsive mobile view of the centered converter flow.
 </p>
 
 <br />
@@ -43,7 +43,7 @@ The preview shows the converter-first desktop workspace with its modern transpar
 
 ## Highlights
 
-- Dark, premium converter workspace focused on the upload-to-download flow
+- Centered first-viewport converter with a responsive glassmorphism interface
 - Automatic source format detection from the uploaded file
 - Target formats filtered to only show valid options for the active file
 - Job tracking with progress, status messages, retry, history, and downloads
