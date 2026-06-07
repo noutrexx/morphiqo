@@ -27,48 +27,48 @@
 }
 
 :root {
-  --background: #05070b;
-  --foreground: #f3f7fb;
-  --card: rgba(12, 17, 26, 0.62);
+  --background: #080b18;
+  --foreground: #f7f8ff;
+  --card: rgba(17, 21, 42, 0.58);
   --card-foreground: #f3f7fb;
   --popover: rgba(10, 14, 22, 0.92);
   --popover-foreground: #f3f7fb;
-  --primary: #68e1ff;
-  --primary-foreground: #021018;
+  --primary: #7c6cff;
+  --primary-foreground: #ffffff;
   --secondary: rgba(149, 164, 184, 0.1);
   --secondary-foreground: #dbe8f5;
   --muted-surface: rgba(149, 164, 184, 0.08);
   --muted-foreground: #9aa9ba;
-  --accent-surface: rgba(198, 255, 107, 0.1);
-  --accent-foreground: #efffce;
+  --accent-surface: rgba(124, 108, 255, 0.14);
+  --accent-foreground: #eeebff;
   --destructive: #ff5f72;
   --border-token: rgba(188, 219, 255, 0.16);
   --input: rgba(188, 219, 255, 0.13);
-  --ring: rgba(104, 225, 255, 0.52);
-  --bg: #05070b;
-  --bg-soft: #0a0e16;
-  --panel: rgba(12, 17, 26, 0.66);
-  --panel-muted: rgba(18, 24, 34, 0.58);
-  --panel-strong: rgba(20, 27, 39, 0.76);
-  --text: #f3f7fb;
-  --muted: #9aa9ba;
+  --ring: rgba(135, 119, 255, 0.58);
+  --bg: #080b18;
+  --bg-soft: #10152a;
+  --panel: rgba(17, 21, 42, 0.58);
+  --panel-muted: rgba(24, 30, 58, 0.52);
+  --panel-strong: rgba(25, 31, 60, 0.72);
+  --text: #f7f8ff;
+  --muted: #a8afc7;
   --inverted: #ffffff;
-  --border: rgba(188, 219, 255, 0.16);
-  --border-dark: rgba(188, 219, 255, 0.09);
-  --accent: #68e1ff;
-  --accent-strong: #c6ff6b;
-  --accent-cool: #68e1ff;
-  --accent-blue: #8aa8ff;
-  --accent-soft: rgba(104, 225, 255, 0.12);
+  --border: rgba(221, 225, 255, 0.18);
+  --border-dark: rgba(221, 225, 255, 0.1);
+  --accent: #7c6cff;
+  --accent-strong: #52d6c8;
+  --accent-cool: #82b7ff;
+  --accent-blue: #82b7ff;
+  --accent-soft: rgba(124, 108, 255, 0.14);
   --warning: #ffd166;
   --warning-soft: rgba(255, 209, 102, 0.14);
   --danger: #ff5f72;
   --danger-soft: rgba(255, 95, 114, 0.14);
-  --success: #c6ff6b;
-  --success-soft: rgba(198, 255, 107, 0.13);
-  --shadow: 0 28px 90px rgba(0, 0, 0, 0.5);
-  --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.34);
-  --radius: 0px;
+  --success: #61e1b9;
+  --success-soft: rgba(97, 225, 185, 0.14);
+  --shadow: 0 34px 100px rgba(4, 7, 24, 0.42);
+  --shadow-soft: 0 18px 48px rgba(4, 7, 24, 0.24);
+  --radius: 16px;
   --sans: Inter, Aptos, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --display: 'Plus Jakarta Sans', Inter, Aptos, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
@@ -96,10 +96,11 @@ body {
   overflow-x: hidden;
   scrollbar-width: none;
   background:
-    radial-gradient(ellipse at 15% -10%, rgba(104, 225, 255, 0.15), transparent 42%),
-    radial-gradient(ellipse at 90% 4%, rgba(138, 168, 255, 0.1), transparent 36%),
-    radial-gradient(ellipse at 52% 72%, rgba(198, 255, 107, 0.045), transparent 38%),
-    linear-gradient(155deg, #080c13 0%, #05070b 48%, #070a10 100%),
+    radial-gradient(ellipse at 8% 8%, rgba(82, 214, 200, 0.22), transparent 36%),
+    radial-gradient(ellipse at 88% 4%, rgba(124, 108, 255, 0.3), transparent 40%),
+    radial-gradient(ellipse at 70% 88%, rgba(130, 183, 255, 0.18), transparent 40%),
+    radial-gradient(ellipse at 22% 92%, rgba(239, 154, 255, 0.12), transparent 34%),
+    linear-gradient(145deg, #0d1228 0%, #080b18 52%, #0c1023 100%),
     var(--bg);
   background-attachment: fixed;
 }

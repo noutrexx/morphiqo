@@ -51,14 +51,14 @@ export function FileDropzone({ onAddFiles }: FileDropzoneProps) {
         className="dropzone__button"
         type="button"
         aria-label="Browse files"
-        size="icon-lg"
         onClick={() => inputRef.current?.click()}
       >
-        <UploadCloud className="size-6" />
+        <UploadCloud size={19} />
+        Choose file
       </Button>
       <div>
-        <h2>Browse Files</h2>
-        <p>Drag files here or choose them from your device to start the conversion flow.</p>
+        <h2>Drop your file here</h2>
+        <p>Drag and drop a file, or choose one from your device.</p>
         <div className="dropzone__meta" aria-label="Upload constraints">
           <span>Images</span>
           <span>Documents</span>
