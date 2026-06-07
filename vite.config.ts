@@ -10,4 +10,14 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  server: {
+    watch: {
+      ignored: [
+        '**/logs/**',
+        '**/outputs/**',
+        '**/uploads/**',
+        '**/docs/screenshots/**',
+      ],
+    },
+  },
 })

@@ -3,6 +3,7 @@ dist
 dist-api
 uploads
 outputs
+logs
 .env
 .env.local
 .DS_Store
