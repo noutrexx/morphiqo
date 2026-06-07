@@ -156,12 +156,53 @@
 }
 
 .product-story-section {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.78fr);
   gap: 18px;
   align-items: center;
   padding: 36px 0 30px;
   scroll-margin-top: 98px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 229, 255, 0.12);
+  border-radius: 24px;
+  padding: clamp(34px, 5vw, 72px);
+  background: rgba(12, 16, 34, 0.42);
+  box-shadow: var(--shadow-soft);
+}
+
+.product-story-section > :not(.section-art),
+.systems-section > :not(.section-art) {
+  position: relative;
+  z-index: 1;
+}
+
+.section-art {
+  position: absolute;
+  z-index: 0;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.section-art--portal {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.68;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.22) 34%, #000 72%);
+  mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.22) 34%, #000 72%);
+}
+
+.product-story-section::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: '';
+  background: linear-gradient(90deg, rgba(8, 11, 24, 0.96) 0%, rgba(8, 11, 24, 0.82) 44%, rgba(8, 11, 24, 0.08) 100%);
+  pointer-events: none;
 }
 
 .converter-stage {
@@ -175,7 +216,25 @@
 
 .workspace-grid,
 .systems-section {
+  position: relative;
+  isolation: isolate;
   scroll-margin-top: 98px;
+  overflow: hidden;
+  border: 1px solid rgba(226, 229, 255, 0.1);
+  border-radius: 24px;
+  padding: clamp(28px, 4vw, 54px);
+  background: rgba(12, 16, 34, 0.42);
+}
+
+.section-art--network {
+  inset: 0 auto 0 0;
+  width: 62%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.24;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.72) 48%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.72) 48%, transparent 100%);
 }
 
 .hero-copy {
@@ -2425,6 +2484,26 @@
     height: 34px;
     margin: -4px auto;
     transform: rotate(90deg);
+  }
+
+  .product-story-section,
+  .systems-section {
+    border-radius: 20px;
+    padding: 26px 18px;
+  }
+
+  .section-art--portal {
+    opacity: 0.36;
+    object-position: 68% center;
+  }
+
+  .product-story-section::after {
+    background: linear-gradient(180deg, rgba(8, 11, 24, 0.94) 0%, rgba(8, 11, 24, 0.72) 70%, rgba(8, 11, 24, 0.5) 100%);
+  }
+
+  .section-art--network {
+    width: 100%;
+    opacity: 0.12;
   }
 }
 

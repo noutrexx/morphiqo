@@ -25,6 +25,8 @@ import { Badge } from './components/ui/badge'
 import { Card } from './components/ui/card'
 import { useConversionManager } from './hooks/useConversionManager'
 import engineMatrix from './assets/engine-matrix.svg'
+import engineNetwork from './assets/engine-network.webp'
+import conversionPortal from './assets/conversion-portal.webp'
 import morphiqoMark from './assets/morphiqo-mark.svg'
 import './App.css'
 
@@ -253,6 +255,7 @@ export function App() {
         </section>
 
         <section className="product-story-section" id="product" aria-label="Morphiqo product story">
+          <img className="section-art section-art--portal" src={conversionPortal} alt="" aria-hidden="true" />
           <div className="hero-copy">
             <span className="hero-kicker">
               <Zap size={16} />
@@ -307,6 +310,7 @@ export function App() {
         </section>
 
         <section className="systems-section" id="systems" aria-label="Core systems and profile">
+          <img className="section-art section-art--network" src={engineNetwork} alt="" aria-hidden="true" />
           <div className="section-title">
             <span className="eyebrow">Core Systems</span>
             <h2>Engine-backed conversion with a focused product workflow.</h2>
