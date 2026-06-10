@@ -14,17 +14,17 @@ Designed and vibe-coded by **noutrexx**.
 ## Preview
 
 <p align="center">
-  <img src="./docs/screenshots/09-centered-glass-desktop.png" alt="Morphiqo centered glass converter desktop workspace" width="900" />
+  <img src="./docs/screenshots/13-refresh-hero-desktop.png" alt="Morphiqo centered glass converter with gradient display type and focal glow" width="900" />
 </p>
 
-The preview shows the centered glass converter: drag and drop, source and target format selectors, engine status, and the primary conversion action all fit in the first viewport.
+The centered glass converter is the first thing you see: drag and drop, source and target format selectors, engine status, and the primary conversion action all fit in the first viewport. A soft focal glow anchors the panel and a living aurora drifts behind the whole surface.
 
 <br />
 
 ### Additional views
 
 <p align="center">
-  <img src="./docs/screenshots/10-centered-glass-mobile.png" alt="Morphiqo centered glass converter mobile workspace" width="300" />
+  <img src="./docs/screenshots/14-refresh-hero-mobile.png" alt="Morphiqo responsive mobile converter workspace" width="300" />
 </p>
 
 <p align="center">
@@ -34,21 +34,21 @@ The preview shows the centered glass converter: drag and drop, source and target
 <br />
 
 <p align="center">
-  <img src="./docs/screenshots/11-visual-product-story.png" alt="Morphiqo visual product story section" width="900" />
+  <img src="./docs/screenshots/15-refresh-product-story.png" alt="Morphiqo product story section with live workspace preview" width="900" />
 </p>
 
 <p align="center">
-  Product story section with a custom file-conversion portal visual.
+  Product story section with metrics and a live workspace preview.
 </p>
 
 <br />
 
 <p align="center">
-  <img src="./docs/screenshots/12-visual-engine-systems.png" alt="Morphiqo visual engine systems section" width="900" />
+  <img src="./docs/screenshots/16-refresh-engine-systems.png" alt="Morphiqo engine systems section with routing matrix" width="900" />
 </p>
 
 <p align="center">
-  Engine systems section with a custom routing-network visual.
+  Engine systems section with the conversion routing matrix.
 </p>
 
 ## Highlights
@@ -61,6 +61,14 @@ The preview shows the centered glass converter: drag and drop, source and target
 - Extractable PDF conversion paths for `txt`, `html`, `md`, and `docx`
 - Backend routing prepared for FFmpeg, LibreOffice, Pandoc, ImageMagick, and 7zip
 - Safer file handling with size limits, sanitized names, and isolated output files
+
+## Design Language
+
+- Local-first glassmorphism: layered translucent panels over a living aurora background
+- Typeface system loaded for the intended look — Plus Jakarta Sans (display), Inter (body), JetBrains Mono (labels)
+- Gradient display ink on the primary headings for brand character
+- A focal glow anchors the centered converter so the primary action reads first
+- Motion is subtle and respects `prefers-reduced-motion`
 
 ## Tech Stack
 

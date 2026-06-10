@@ -2604,3 +2604,91 @@
     border-radius: 14px;
   }
 }
+
+/* ===========================================================
+   Design refresh — focal glow, gradient display type, motion
+   =========================================================== */
+
+/* Soft animated halo behind the centered converter to anchor the eye */
+.converter-first-section {
+  position: relative;
+}
+
+.converter-first-section::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 48%;
+  left: 50%;
+  width: min(820px, 94%);
+  height: min(560px, 72%);
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(124, 108, 255, 0.34), transparent 66%),
+    radial-gradient(circle at 28% 72%, rgba(82, 214, 200, 0.22), transparent 70%),
+    radial-gradient(circle at 76% 70%, rgba(130, 183, 255, 0.18), transparent 72%);
+  filter: blur(72px);
+  opacity: 0.7;
+  pointer-events: none;
+  animation: converter-glow 9s ease-in-out infinite alternate;
+}
+
+.converter-stage {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes converter-glow {
+  from {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+/* Display headings get a premium gradient ink */
+.converter-panel__intro h1,
+.hero-copy h1 {
+  background: linear-gradient(118deg, #ffffff 0%, #cbc4ff 44%, #8fe9dd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Format-flow arrow nudges toward the target on hover (desktop only) */
+.format-flow__arrow {
+  transition:
+    transform 200ms ease,
+    color 200ms ease,
+    background 200ms ease;
+}
+
+@media (min-width: 861px) {
+  .format-flow:hover .format-flow__arrow {
+    transform: translateX(3px);
+    color: #d8d2ff;
+    background: rgba(124, 108, 255, 0.2);
+  }
+}
+
+/* Primary actions brighten slightly on hover for tactile feedback */
+.primary-action:hover:not(:disabled),
+.dropzone__button:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .converter-first-section::before {
+    animation: none;
+  }
+
+  .format-flow__arrow,
+  .primary-action,
+  .dropzone__button {
+    transition: none;
+  }
+}
