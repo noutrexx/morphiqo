@@ -93,7 +93,7 @@ convertRouter.post('/convert', upload.single('file'), async (req, res) => {
     status: 'queued',
     progress: 0,
     inputPath: path.resolve(file.path),
-    message: 'Is kuyruga alindi.',
+    message: 'Job queued.',
   })
 
   void startConversion({
@@ -112,8 +112,24 @@ function hasExpectedMimeType(mimeType: string, sourceFormat: string): boolean {
     jpg: ['image/jpeg'],
     png: ['image/png'],
     webp: ['image/webp'],
+    gif: ['image/gif'],
+    bmp: ['image/bmp', 'image/x-ms-bmp'],
+    tiff: ['image/tiff'],
+    svg: ['image/svg+xml'],
+    ico: ['image/x-icon', 'image/vnd.microsoft.icon'],
+    pdf: ['application/pdf'],
   }
   const allowedMimeTypes = expectedMimeTypes[sourceFormat]
 
-  return !allowedMimeTypes || allowedMimeTypes.includes(mimeType)
+  // Formats we don't fingerprint pass through on extension alone.
+  if (!allowedMimeTypes) {
+    return true
+  }
+
+  // Browsers occasionally send a generic type; don't reject those false-negatives.
+  if (mimeType === '' || mimeType === 'application/octet-stream') {
+    return true
+  }
+
+  return allowedMimeTypes.includes(mimeType)
 }

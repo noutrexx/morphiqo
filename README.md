@@ -132,13 +132,22 @@ Run the frontend:
 npm run dev
 ```
 
-Run the backend in another terminal:
+Run the backend in another terminal (required for real engine-backed conversions):
 
 ```bash
 npm run dev:api
 ```
 
 Open `http://localhost:5173`.
+
+## Conversion Behavior
+
+Morphiqo runs in one of two modes depending on whether the backend is reachable:
+
+- **Engine mode (backend running).** With `npm run dev:api` up and `VITE_API_BASE_URL` set, files are uploaded to the Express API and converted by real engines — Sharp for `jpg`/`png`/`webp`, plus the optional engines (FFmpeg, LibreOffice, Pandoc, ImageMagick, 7zip) for everything else.
+- **Browser mock mode (no backend, development only).** If the API is unreachable while running `npm run dev`, the UI falls back to an in-browser mock so the workflow stays explorable: a `<canvas>` re-encode for `jpg`/`png`/`webp` and simple text transforms for `txt`/`html`/`md`. This is for previewing the interface, not for production-grade output. In a production build there is no mock fallback — an unreachable API surfaces an error instead.
+
+Backend jobs are kept in an in-memory store (capped at the most recent 200) and reset when the API process restarts. Persistent job storage and worker queues are intentionally left as next steps.
 
 ## Environment
 

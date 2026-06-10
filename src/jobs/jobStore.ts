@@ -21,6 +21,10 @@ export interface ServerJob {
 
 const jobs = new Map<string, ServerJob>()
 
+// Bound the in-memory store so a long-running server cannot grow unboundedly.
+// Map preserves insertion order, so the oldest jobs are evicted first.
+const MAX_JOBS = 200
+
 export function createJob(data: Omit<ServerJob, 'createdAt' | 'updatedAt'>): ServerJob {
   const now = new Date().toISOString()
   const job: ServerJob = {
@@ -30,7 +34,18 @@ export function createJob(data: Omit<ServerJob, 'createdAt' | 'updatedAt'>): Ser
   }
 
   jobs.set(job.id, job)
+  evictOldestJobs()
   return job
+}
+
+function evictOldestJobs(): void {
+  while (jobs.size > MAX_JOBS) {
+    const oldestKey = jobs.keys().next().value
+    if (oldestKey === undefined) {
+      break
+    }
+    jobs.delete(oldestKey)
+  }
 }
 
 export function getJob(jobId: string): ServerJob | undefined {
