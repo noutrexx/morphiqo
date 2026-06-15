@@ -197,10 +197,15 @@ Other conversion pairs are routed to optional local engines when they are instal
 ## Validation
 
 ```bash
+npm ci
+npm audit --audit-level=high
 npm run lint
 npm run build
 npm run build:api
 ```
+
+Run the complete local validation suite with `npm run check`. GitHub Actions runs the same
+checks for every pull request and every push to `master`.
 
 ## Project Scope
 

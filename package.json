@@ -8,6 +8,7 @@
     "dev:api": "tsx watch src/server.ts",
     "build:api": "tsc -p tsconfig.server.json",
     "build": "tsc -b && vite build",
+    "check": "npm audit --audit-level=high && npm run lint && npm run build && npm run build:api",
     "lint": "eslint .",
     "preview": "vite preview"
   },
