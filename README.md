@@ -11,6 +11,15 @@ Designed and vibe-coded by **noutrexx**.
 ![Sharp](https://img.shields.io/badge/Sharp-image%20engine-99CC00)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-38BDF8?logo=tailwindcss&logoColor=white)
 
+<p align="center">
+  <a href="#preview">Preview</a> ·
+  <a href="#highlights">Highlights</a> ·
+  <a href="#tech-stack">Tech Stack</a> ·
+  <a href="#getting-started">Getting Started</a> ·
+  <a href="#api">API</a> ·
+  <a href="#project-scope">Scope</a>
+</p>
+
 ## Preview
 
 <p align="center">
